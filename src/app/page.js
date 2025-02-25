@@ -1,9 +1,10 @@
-import Image from "next/image";
+"use client"
+import WorkProcess from "@/components/ui/WorkProcess";
 
 export default function Home() {
   return (
     <>
-      
+      <WorkProcess />
     </>
   );
 }
