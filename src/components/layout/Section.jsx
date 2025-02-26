@@ -3,7 +3,7 @@ const Section = ({ children, className = "", bgColor = "bg-white", id }) => {
   
     return (
       <section id={id} className={`py-10 ${backgroundClass} ${className}`}>
-        <div className="container mx-auto px-2 max-w-6xl">{children}</div>
+        <div className="container mx-auto px-2 max-w-7xl">{children}</div>
       </section>
     );
   };
