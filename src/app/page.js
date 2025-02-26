@@ -5,8 +5,8 @@ import WorkProcessSection from "@/components/layout/WorkProcessSection";
 export default function Home() {
   return (
     <>
-      <WorkProcessSection />
-      <AboutSection />
+      <WorkProcessSection id="work-process"/>
+      <AboutSection id="about-us"/>
     </>
   );
 }
