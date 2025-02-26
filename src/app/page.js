@@ -1,10 +1,12 @@
 "use client"
-import WorkProcess from "@/components/ui/WorkProcess";
+import AboutSection from "@/components/layout/AboutSection";
+import WorkProcessSection from "@/components/layout/WorkProcessSection";
 
 export default function Home() {
   return (
     <>
-      <WorkProcess />
+      <WorkProcessSection />
+      <AboutSection />
     </>
   );
 }
