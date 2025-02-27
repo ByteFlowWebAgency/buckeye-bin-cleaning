@@ -1,32 +1,31 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import ProcessCard from '../ui/ProcessCard';
-import ProcessArrow from '../ui/ProcessArrow';
-import { processSteps } from '../../data/processData';
+import React from "react";
+import { motion } from "framer-motion";
+import ProcessCard from "../ui/ProcessCard";
+import ProcessArrow from "../ui/ProcessArrow";
+import { processSteps } from "../../data/processData";
 
 const WorkProcess = () => {
-  // Animation variants
   const containerVariants = {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.15
-      }
-    }
+        staggerChildren: 0.15,
+      },
+    },
   };
 
   const itemVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 20 
+    hidden: {
+      opacity: 0,
+      y: 20,
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
-        duration: 0.5
-      }
-    }
+        duration: 0.5,
+      },
+    },
   };
 
   return (
@@ -39,16 +38,20 @@ const WorkProcess = () => {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">OUR WORK PROCESS</h2>
-          <p className="text-gray-700 max-w-3xl mx-auto">
-            Our thorough process ensures that your bins are not only clean but also
-            safe and odor-free. Let us take care of the dirty work so you can enjoy a
-            cleaner, healthier, and safer environment.
-          </p>
+          <div className="text-left pl-10">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              OUR WORK PROCESS
+            </h2>
+            <p className="text-gray-700 max-w-3xl">
+              Our thorough process ensures that your bins are not only clean but
+              also safe and odor-free. Let us take care of the dirty work so you
+              can enjoy a cleaner, healthier, and safer environment.
+            </p>
+          </div>
         </motion.div>
 
         <div className="flex justify-center">
-          <motion.div 
+          <motion.div
             className="flex flex-wrap justify-center md:flex-nowrap overflow-x-auto pb-6 max-w-full"
             variants={containerVariants}
             initial="hidden"
@@ -57,11 +60,13 @@ const WorkProcess = () => {
             style={{ gap: "1px" }}
           >
             {processSteps.map((step, index) => (
-              <motion.div 
+              <motion.div
                 key={step.id}
                 className="flex-none mb-8 sm:mb-0 relative"
                 variants={itemVariants}
-                style={{ marginRight: index < processSteps.length - 1 ? "0" : "0" }}
+                style={{
+                  marginRight: index < processSteps.length - 1 ? "0" : "0",
+                }}
               >
                 <div className="relative">
                   <ProcessCard step={step} />
