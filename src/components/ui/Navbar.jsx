@@ -19,13 +19,13 @@ const Navbar = () => {
 
   return (
     <Section id="home" className="py-10 px-4 bg-[#37B6FF]">
-      <header className="max-w-7xl mx-auto flex items-center justify-between md:justify-center relative">
-        <div className="mx-auto flex items-center justify-between">
+      <header className="max-w-7xl mx-auto flex items-center relative">
+        <div className="mx-auto flex items-center w-full relative">
           <a
             href="/"
             aria-label="Home"
             onClick={() => scrollToSection("home")}
-            className="absolute left-0"
+            className="absolute -left-4 md:-left-10 lg:-left-16"
           >
             <Image
               src={BuckeyeBinCleaningLogo}
