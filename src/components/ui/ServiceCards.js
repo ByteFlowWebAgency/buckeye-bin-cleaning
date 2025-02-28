@@ -16,10 +16,14 @@ const ServiceCard = ({
     }
   };
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-200 w-100 mx-auto flex flex-col justify-between">
+    <div
+      className={`bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-200 mx-auto flex flex-col justify-between ${
+        serviceType === "Buckeye Summer Package" ? "w-[350px]" : "w-[270px]"
+      }`}
+    >
       <h2
         className={`font-bold text-[#5A5A5A] whitespace-nowrap ${
-          serviceType === "Buckeye Summer Package" ? "text-2xl" : "text-3xl"
+          serviceType === "Buckeye Summer Package" ? "text-2xl" : "text-2xl"
         }`}
       >
         {serviceType}

@@ -47,9 +47,9 @@ const cardVariants = {
 const Services = () => {
   return (
     <Section id="services" className="bg-[#37B6FF] pb-32 mb-40">
-      <div className="container px-12">
+      <div className="container px-6 mx-auto">
         <motion.h1
-          className="text-white font-bold text-5xl py-12"
+          className="text-white font-bold text-5xl py-12 sm:text-center md:text-center lg:text-left xl:text-left"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -57,7 +57,7 @@ const Services = () => {
           Our Service Plans
         </motion.h1>
 
-        <div className="flex justify-center gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {servicePlans.map((plan, index) => (
             <motion.div
               key={plan.id}
