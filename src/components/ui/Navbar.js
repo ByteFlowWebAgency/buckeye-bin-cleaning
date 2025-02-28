@@ -53,7 +53,7 @@ const Navbar = () => {
           </button>
 
           <nav className="hidden md:flex items-center gap-8 text-white mx-auto">
-            {["Home", "Process", "Service", "About Us", "Contact Us"].map(
+            {["Home", "Process", "Services", "About Us", "Contact Us"].map(
               (item) => (
                 <button
                   key={item}
@@ -70,7 +70,7 @@ const Navbar = () => {
 
           {isMenuOpen && (
             <nav className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center space-y-6 z-40">
-              {["Home", "Process", "Service", "About Us", "Contact Us"].map(
+              {["Home", "Process", "Services", "About Us", "Contact Us"].map(
                 (item) => (
                   <button
                     key={item}

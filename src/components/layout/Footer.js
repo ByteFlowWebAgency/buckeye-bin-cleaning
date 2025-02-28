@@ -66,7 +66,7 @@ const Footer = () => {
                 <li>
                   <a
                     aria-label="Service"
-                    onClick={() => scrollToSection("service")}
+                    onClick={() => scrollToSection("services")}
                     className="cursor-pointer hover:text-blue-500"
                   >
                     Service
