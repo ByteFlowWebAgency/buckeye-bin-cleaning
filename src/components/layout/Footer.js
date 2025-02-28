@@ -17,7 +17,7 @@ const Footer = () => {
   return (
     <Section>
       <div className="bg-white py-10 border-t w-full border-gray-300">
-        <div className="flex jusitfy-between container mx-auto px-6 lg:px-16 grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="container mx-auto px-6 lg:px-16 grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
           <div>
             <Image
               src={BuckeyeBinCleaningLogo}
@@ -40,8 +40,8 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 mx-auto md:mx-auto mx-0">
-            <div>
+          <div>
+            <div className="mx-0 sm:mx-0 md:mx-auto lg:ml-20">
               <h3 className="text-[#37B6FF] font-semibold">QUICK LINKS</h3>
               <ul className="mt-2 space-y-4 text-gray-600 text-sm">
                 <li>
