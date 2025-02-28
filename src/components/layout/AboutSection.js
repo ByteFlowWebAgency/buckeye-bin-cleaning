@@ -4,6 +4,7 @@ import Image from "next/image";
 import AboutUsImage1 from "../../../public/assets/images/about-us-cleaning.png";
 import AboutUsImage2 from "../../../public/assets/images/about-us-cleaning2.png";
 import Section from "./Section";
+import CleanedBin from "../../../public/assets/images/buckeyebincleaningimage.jpg";
 
 const AboutSection = () => {
   const fadeInLeft = {
@@ -61,10 +62,10 @@ const AboutSection = () => {
           >
             <div className="relative rounded-lg overflow-hidden shadow-lg">
               <Image
-                src={AboutUsImage1}
+                src={CleanedBin}
                 alt="Buckeye Bin Cleaning Team"
                 width={550}
-                height={410}
+                height={700}
                 className="w-full h-auto object-cover"
                 priority
               />
@@ -88,28 +89,19 @@ const AboutSection = () => {
               className="text-gray-700 text-base md:text-lg mb-20 leading-relaxed"
               variants={fadeInUp}
             >
-              Welcome Buckeye Bin Cleaning! We are your premier trash bin
-              cleaning company dedicated to keeping your bins spotless and
-              odor-free. Serving Cleveland and surrounding areas, we use
-              eco-friendly cleaning solutions and state-of-the-art equipment to
-              ensure your trash bins are not only clean but also sanitized. Our
-              team is committed to providing exceptional service, making your
-              environment healthier and more pleasant. Let us handle the dirty
-              work so you can enjoy a cleaner, fresher home or business.
+              <strong>Welcome to Buckeye Bin Cleaning!</strong> We are your
+              premier trash bin cleaning company dedicated to keeping your bins
+              spotless and odor-free. Serving Cleveland and surrounding areas,
+              we use eco-friendly cleaning solutions and state-of-the-art
+              equipment to ensure your trash bins are not only clean but also
+              sanitized. Our team is committed to providing exceptional service,
+              making your environment healthier and more pleasant. Let us handle
+              the dirty work so you can enjoy a cleaner, fresher home or
+              business.
             </motion.p>
-          </motion.div>
-        </div>
 
-        <div className="flex flex-col-reverse lg:flex-row items-center gap-8 md:gap-12">
-          <motion.div
-            className="w-full lg:w-7/12 mt-8 lg:mt-0"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInLeft}
-          >
             <motion.p
-              className="text-gray-700 text-base md:text-lg leading-relaxed mb-6"
+              className="text-gray-700 text-base md:text-lg leading-relaxed"
               variants={fadeInUp}
             >
               We also specialize in revitalizing hard surfaces with our
@@ -119,27 +111,8 @@ const AboutSection = () => {
               stains, restoring the original beauty of your surfaces. Serving
               the Cleveland area, we are committed to delivering exceptional
               results and customer satisfaction. Trust Buckeye Bin Cleaning to
-              keep your hard surfaces looking their best. <br />
-              Description of the process of getting your bins clean!
+              keep your hard surfaces looking their best.
             </motion.p>
-          </motion.div>
-
-          <motion.div
-            className="w-full lg:w-5/12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInRight}
-          >
-            <div className="relative rounded-lg overflow-hidden shadow-lg">
-              <Image
-                src={AboutUsImage2}
-                alt="Pressure Washing Equipment"
-                width={550}
-                height={410}
-                className="w-full h-auto object-cover"
-              />
-            </div>
           </motion.div>
         </div>
       </div>
