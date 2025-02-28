@@ -25,13 +25,13 @@ const Navbar = () => {
             href="/"
             aria-label="Home"
             onClick={() => scrollToSection("home")}
-            className="absolute -left-4 md:-left-10 lg:-left-16"
+            className="-left-4 md:-left-10 lg:-left-16"
           >
             <Image
               src={BuckeyeBinCleaningLogo}
               alt="Buckeye Bin Cleaning Logo"
-              width={150}
-              height={10}
+              width={100}
+              height={100}
               className="transition-opacity hover:opacity-80"
               priority
             />
