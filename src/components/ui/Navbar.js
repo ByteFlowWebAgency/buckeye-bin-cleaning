@@ -18,7 +18,10 @@ const Navbar = () => {
   };
 
   return (
-    <Section id="home" className="py-10 px-4 bg-[#37B6FF]">
+    <Section
+      id="home"
+      className="py-10 px-4 bg-[#37B6FF] border-b border-b-gray-600"
+    >
       <header className="max-w-7xl mx-auto flex items-center relative">
         <div className="mx-auto flex items-center w-full relative">
           <a

@@ -42,7 +42,7 @@ const Hero = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold whitespace-nowrap">
+            <h1 className="text-5xl md:text-5xl font-bold whitespace-nowrap">
               Welcome To <br />
               <span className="text-white">Buckeye Bin </span>
               <span className="text-red-600">Cleaning!</span>
