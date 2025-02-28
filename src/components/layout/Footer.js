@@ -49,6 +49,7 @@ const Footer = () => {
                     href="/"
                     aria-label="Home"
                     onClick={() => scrollToSection("home")}
+                    className="cursor-pointer hover:text-blue-500"
                   >
                     Home
                   </a>
