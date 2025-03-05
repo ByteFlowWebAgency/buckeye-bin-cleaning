@@ -16,7 +16,7 @@ export default function Home() {
       <WorkProcessSection id="work-process" />
       <Services id="services" />
       <AboutSection id="about-us" />
-      <ContactUsSection />
+      <ContactUsSection id="contact-us" />
       <Footer />
     </>
   );

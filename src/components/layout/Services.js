@@ -8,7 +8,7 @@ const servicePlans = [
     id: "monthly",
     serviceType: "Monthly",
     price: 30,
-    duration: "Every 3 months",
+    duration: "Every month",
     numberOfcans: "Includes 2 cans",
   },
   {
@@ -68,6 +68,7 @@ const Services = () => {
               custom={index}
             >
               <ServiceCard
+                id={plan.id}
                 serviceType={plan.serviceType}
                 price={plan.price}
                 duration={plan.duration}

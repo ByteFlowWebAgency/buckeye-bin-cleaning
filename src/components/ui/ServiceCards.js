@@ -1,24 +1,57 @@
 import React from "react";
 import Image from "next/image";
-import Button from "../ui/Button";
+import { useRouter } from "next/navigation";
+import Button from "./Button";
 import CheckMark from "../../../public/assets/images/checkmark.svg";
 
 const ServiceCard = ({
+  id = "",
   serviceType = "",
   price = "",
   duration = "",
   numberOfcans = "",
 }) => {
-  const scrollToSection = (id) => {
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
+  const router = useRouter();
+
+  const handlePlanSelection = () => {
+    // First try to find the contact-us section which contains the form
+    const contactSection = document.getElementById("contact-us");
+    // Also check for the direct form ID
+    const signUpForm = document.getElementById("sign-up");
+    
+    // Determine which element to scroll to
+    const targetElement = contactSection || signUpForm;
+    
+    if (targetElement) {
+      // If on same page, scroll to the section containing the form
+      targetElement.scrollIntoView({ behavior: "smooth" });
+      
+      // Short delay to ensure DOM is ready before updating form state
+      setTimeout(() => {
+        // Dispatch a custom event to notify the form of plan selection
+        window.dispatchEvent(new CustomEvent('planSelected', { 
+          detail: { planId: id }
+        }));
+
+        // Also try to select the value directly in the dropdown
+        const selectElement = document.querySelector('select[name="servicePlan"]');
+        if (selectElement) {
+          selectElement.value = id;
+          // Trigger a change event so React state updates
+          const event = new Event('change', { bubbles: true });
+          selectElement.dispatchEvent(event);
+        }
+      }, 100);
+    } else {
+      // If not on same page, navigate to contact page with plan parameter
+      router.push(`/contact?plan=${id}#sign-up`);
     }
   };
+
   return (
     <div
       className={`bg-white rounded-2xl shadow-lg p-6 text-center border border-gray-200 mx-auto flex flex-col justify-between ${
-        serviceType === "Buckeye Summer Package" ? "w-[350px]" : "w-[270px]"
+        serviceType === "Buckeye Summer Package" ? "w-full max-w-[350px]" : "w-full max-w-[270px]"
       }`}
     >
       <h2
@@ -41,7 +74,7 @@ const ServiceCard = ({
         </li>
       </ul>
       <Button
-        onClick={() => scrollToSection("contact-us")}
+        onClick={handlePlanSelection}
         className="mt-4 bg-red-600 text-white font-semibold py-2 px-6 rounded-md shadow-lg hover:bg-red-700 transition whitespace-nowrap"
       >
         Choose this Plan →
