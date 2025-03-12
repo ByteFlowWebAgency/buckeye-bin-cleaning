@@ -1,10 +1,10 @@
-import initialInspectionIcon from '../../public/assets/images/initial-inspection-icon.png';
-import preTreatmentIcon from '../../public/assets/images/pre-treatment-icon.png';
-import highPressureIcon from '../../public/assets/images/high-pressure-cleaning-icon.png';
-import deodorizationIcon from '../../public/assets/images/deordorization-icon.png';
-import finalInspectionIcon from '../../public/assets/images/final-inspection-icon.png';
-import returnIcon from '../../public/assets/images/return-bins-icon.png';
-import billingIcon from '../../public/assets/images/billing-icon.png';
+import initialInspectionIcon from '../../../public/assets/images/initial-inspection-icon.png';
+import preTreatmentIcon from '../../../public/assets/images/pre-treatment-icon.png';
+import highPressureIcon from '../../../public/assets/images/high-pressure-cleaning-icon.png';
+import deodorizationIcon from '../../../public/assets/images/deordorization-icon.png';
+import finalInspectionIcon from '../../../public/assets/images/final-inspection-icon.png';
+import returnIcon from '../../../public/assets/images/return-bins-icon.png';
+import billingIcon from '../../../public/assets/images/billing-icon.png';
 
 export const processSteps = [
   {

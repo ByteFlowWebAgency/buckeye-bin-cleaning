@@ -60,7 +60,7 @@ const AboutSection = () => {
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeInLeft}
           >
-            <div className="relative rounded-lg overflow-hidden shadow-lg">
+            <div className="relative rounded-lg overflow-hidden shadow-sm">
               <Image
                 src={CleanedBin}
                 alt="Buckeye Bin Cleaning Team"

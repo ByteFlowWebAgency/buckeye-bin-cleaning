@@ -54,7 +54,6 @@ const Hero = () => {
 
             <div className="mt-6">
               <Button
-                href="contact-us"
                 onClick={() => scrollToSection("contact-us")}
                 className="bg-red-600 text-white px-6 py-3 rounded-md shadow-lg hover:bg-red-700 transition"
               >

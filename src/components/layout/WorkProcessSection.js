@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import ProcessCard from "../ui/ProcessCard";
 import ProcessArrow from "../ui/ProcessArrow";
-import { processSteps } from "../../data/processData";
+import { processSteps } from "../ui/processData";
 
 const WorkProcess = () => {
   const containerVariants = {
