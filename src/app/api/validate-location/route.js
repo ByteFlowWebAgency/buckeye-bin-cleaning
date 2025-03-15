@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 
-// Constants for service area (Cleveland area)
-const CLEVELAND_CENTER = {
-  latitude: 41.4993,
-  longitude: -81.6944
+const SERVICE_CENTER = {
+  latitude: 41.4048,
+  longitude: -81.7229
 };
-const SERVICE_RADIUS_MILES = 30; // Adjust based on your service area
+const SERVICE_RADIUS_MILES = 18;
 
 // Haversine formula to calculate distance between coordinates
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const toRad = value => (value * Math.PI) / 180;
-  const R = 3958.8; // Earth's radius in miles
+  const R = 3958.8;
   
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
@@ -35,9 +34,10 @@ export async function POST(request) {
       searchAddress += ", Ohio";
     }
     
-    // Ensure we have some kind of zip code region
-    if (!searchAddress.match(/\d{5}/) && !searchAddress.includes("Cleveland")) {
-      searchAddress += ', Cleveland area';
+    if (!searchAddress.match(/\d{5}/) && 
+        !searchAddress.toLowerCase().includes("cleveland") && 
+        !searchAddress.toLowerCase().includes("parma")) {
+      searchAddress += ', Parma area';
     }
     
     // Using native fetch instead of axios for stability
@@ -66,10 +66,10 @@ export async function POST(request) {
       longitude: location.lng
     };
     
-    // Calculate distance from Cleveland center
+    // Calculate distance from Parma center
     const distance = calculateDistance(
-      CLEVELAND_CENTER.latitude,
-      CLEVELAND_CENTER.longitude,
+      SERVICE_CENTER.latitude,
+      SERVICE_CENTER.longitude,
       userCoordinates.latitude,
       userCoordinates.longitude
     );
@@ -80,7 +80,8 @@ export async function POST(request) {
       success: true,
       isWithinServiceArea,
       distance: Math.round(distance),
-      formattedAddress: data.results[0].formatted_address
+      formattedAddress: data.results[0].formatted_address,
+      serviceCenter: "Parma City Hall"
     });
   } catch (error) {
     console.error("Location validation error:", error);

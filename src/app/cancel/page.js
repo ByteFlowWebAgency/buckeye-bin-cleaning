@@ -42,11 +42,13 @@ export default function CancelPage() {
               </Button>
             </Link>
             <div className="ml-2 py-2">
-              <Link href="/" passHref className="pt-10">
-                <Button className="w-full bg-white text-slate-900 border border-red-600 hover:bg-red-600 hover:text-white">
-                  Return to Home
-                </Button>
-              </Link>
+            <Link href="/" passHref className="block w-full sm:w-auto">
+              <button
+                className="w-full py-2 bg-white text-red-800 border-2 border-red-600 rounded-lg font-medium transition-all duration-300 ease-in-out hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+              >
+                Return to Home
+              </button>
+            </Link>
             </div>
           </div>
         </div>

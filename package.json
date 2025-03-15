@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev && node src/scripts/set-admin.js",
-    "build": "next build",
+    "build": "next build && node src/scripts/set-admin.js",
     "start": "next start",
     "lint": "next lint"
   },

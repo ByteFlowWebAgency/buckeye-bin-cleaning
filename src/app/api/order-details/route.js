@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Service plan mapping for display
 const SERVICE_PLANS = {
   monthly: "Monthly Service ($30)",
   quarterly: "Quarterly Service ($45)",
@@ -11,7 +10,6 @@ const SERVICE_PLANS = {
   buckeyeSummerPackage: "Buckeye Summer Package ($100)"
 };
 
-// Map price IDs to service plans
 const PRICE_ID_TO_PLAN = {
   "price_1QyejmQAAGErMriwUFBAzEE0": "Monthly Service ($30)",
   "price_1QyepkQAAGErMriwysZvBPkf": "Quarterly Service ($45)",
@@ -19,14 +17,12 @@ const PRICE_ID_TO_PLAN = {
   "price_1Qyf73QAAGErMriwVB4LSNuG": "Buckeye Summer Package ($100)"
 };
 
-// Time slot mapping for display
 const TIME_SLOTS = {
   morning: "Morning (7am - 11am)",
   afternoon: "Afternoon (11am - 2pm)",
   evening: "Evening (2pm - 5pm)"
 };
 
-// Day of week mapping for display
 const DAYS_OF_WEEK = {
   monday: "Monday",
   tuesday: "Tuesday",

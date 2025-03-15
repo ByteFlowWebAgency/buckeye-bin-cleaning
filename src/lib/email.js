@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-// Create reusable transporter using Gmail
+// Reusable transporter using Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {

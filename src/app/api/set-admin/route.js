@@ -1,4 +1,3 @@
-// app/api/set-admin/route.js
 import { NextResponse } from 'next/server';
 import { adminAuth } from '@/data/firebase-admin';
 

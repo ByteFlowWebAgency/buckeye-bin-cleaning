@@ -22,8 +22,6 @@ const ContactUsSection = () => {
     const handlePlanSelected = (event) => {
       setSelectedPlan(event.detail.planId);
     };
-
-    // Parse initial URL
     handleHashChange();
 
     // Add event listeners
@@ -38,18 +36,18 @@ const ContactUsSection = () => {
   }, []);
 
   return (
-    <Section id="contact-us" className="bg-white py-16">
+    <Section id="contact-us" className="bg-slate-200 py-16">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <motion.h1 
-              className="text-5xl md:text-5xl font-bold text-gray-900 mb-10"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-            >
-              Sign Up Today
-            </motion.h1>
+          <motion.h1 
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-900 mb-6 sm:mb-8 md:mb-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+          >
+            Sign Up Today
+          </motion.h1>
             <motion.p 
               className="text-xl text-gray-600 text-center"
               initial={{ opacity: 0, y: 20 }}

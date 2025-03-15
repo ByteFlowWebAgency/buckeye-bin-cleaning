@@ -78,7 +78,7 @@ export async function POST(request) {
       amount: (session.amount_total / 100).toFixed(2)
     };
 
-    // 4. Send customer cancellation email
+    // Send customer cancellation email
     try {
       await transporter.sendMail({
         from: `"Buckeye Bin Cleaning" <${process.env.EMAIL_USER}>`,
@@ -105,7 +105,7 @@ export async function POST(request) {
         `
       });
       
-      // 5. Send business owner notification
+      // Send business owner notification
       await transporter.sendMail({
         from: `"Buckeye Bin Cleaning System" <${process.env.EMAIL_USER}>`,
         to: process.env.OWNER_EMAIL,
@@ -132,7 +132,6 @@ export async function POST(request) {
       });
     } catch (emailError) {
       console.error('Error sending cancellation emails:', emailError);
-      // Continue with the refund process even if emails fail
     }
 
     try {

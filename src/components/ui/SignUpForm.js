@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import Button from "./Button";
 import Swal from "sweetalert2";
+import PrivacyTermsModal from "./PrivacyTermsModal";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -17,6 +18,9 @@ const formSchema = z.object({
   dayOfPickup: z.string().min(1, { message: "Please select a day for pickup" }),
   timeOfPickup: z.string().min(1, { message: "Please select a time for pickup" }),
   message: z.string().optional(),
+  acceptTerms: z.literal(true, {
+    errorMap: () => ({ message: "You must accept the Terms and Privacy Policy" }),
+  }),
 });
 
 // Service plan options (synchronized with Services.js)
@@ -51,17 +55,19 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     dayOfPickup: "",
     timeOfPickup: "",
     message: "",
+    acceptTerms: false,
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddressValid, setIsAddressValid] = useState(null);
   const [addressValidationMessage, setAddressValidationMessage] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState("privacy");
 
   // Set pre-selected plan when passed from service cards
   useEffect(() => {
     if (preSelectedPlan) {
-      // Update the form data with the selected plan
       setFormData(prev => ({ ...prev, servicePlan: preSelectedPlan }));
       
       // Reset errors for service plan if there were any
@@ -77,7 +83,6 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
   // Set up Google Places Autocomplete
   useEffect(() => {
-    // Set up Google Places Autocomplete
     const setupAutocomplete = () => {
       if (window.google && window.google.maps && window.google.maps.places) {
         const input = document.getElementById('address-input');
@@ -94,7 +99,6 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
                 ...prev,
                 address: place.formatted_address
               }));
-              // Reset validation states since we have a new address
               setIsAddressValid(null);
               setAddressValidationMessage("");
             }
@@ -107,7 +111,6 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     if (window.google && window.google.maps && window.google.maps.places) {
       setupAutocomplete();
     } else {
-      // Wait for Google Maps to load
       const checkGoogleMapsLoaded = setInterval(() => {
         if (window.google && window.google.maps && window.google.maps.places) {
           clearInterval(checkGoogleMapsLoaded);
@@ -115,23 +118,19 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
         }
       }, 100);
       
-      // Clean up
       return () => clearInterval(checkGoogleMapsLoaded);
     }
   }, []);
 
-  // Add this to listen for external form changes (like when ServiceCard directly modifies the select)
   useEffect(() => {
     const handleFormFieldChange = (e) => {
       if (e.target.name === 'servicePlan') {
-        // Only update if the value actually changed
         if (formData.servicePlan !== e.target.value) {
           setFormData(prev => ({ ...prev, servicePlan: e.target.value }));
         }
       }
     };
     
-    // Add listener to form element
     const formElement = document.getElementById('sign-up');
     if (formElement) {
       formElement.addEventListener('change', handleFormFieldChange);
@@ -145,9 +144,8 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
   }, [formData.servicePlan]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     
-    // Reset address validation if address changes
     if (name === "address") {
       setIsAddressValid(null);
       setAddressValidationMessage("");
@@ -155,8 +153,22 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
+
+    // Clear error for this field if it exists
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const openModal = (tab) => {
+    setModalTab(tab);
+    setModalOpen(true);
   };
 
   const validateAddress = async () => {
@@ -179,15 +191,13 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
       if (!data.isWithinServiceArea) {
         setIsAddressValid(false);
-        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${data.distance} miles from Cleveland). We currently only serve Northeast Ohio.`);
+        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${data.distance} miles from Parma). We currently only serve locations within 18 miles of Parma, Ohio.`);
         return false;
       }
 
-      // Address is valid and within service area
       setIsAddressValid(true);
-      setAddressValidationMessage(`Address validated! You're ${data.distance} miles from our service center.`);
+      setAddressValidationMessage(`Address validated! You're ${data.distance} miles from our service center in Parma.`);
       
-      // Update form with formatted address
       setFormData(prev => ({
         ...prev,
         address: data.formattedAddress
@@ -206,12 +216,15 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     try {
       setIsSubmitting(true);
       
+      // Strip the acceptTerms field before sending to the checkout API
+      const { acceptTerms, ...checkoutData } = formData;
+      
       const response = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(checkoutData),
       });
 
       const data = await response.json();
@@ -240,10 +253,8 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     setIsSubmitting(true);
     
     try {
-      // Validate form data
       const validatedData = formSchema.parse(formData);
       
-      // Validate address location
       const addressIsValid = await validateAddress();
       
       if (!addressIsValid) {
@@ -318,254 +329,301 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
   };
 
   return (
-    <motion.form
-      variants={formVariants}
-      initial="hidden"
-      animate="visible"
-      onSubmit={handleSubmit}
-      className="w-full max-w-2xl mx-auto"
-      id="sign-up"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <input
-            type="text"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
-            onChange={handleChange}
-            className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
-              errors.name ? "border-2 border-red-500" : ""
-            }`}
-            disabled={isSubmitting}
-          />
-          {errors.name && (
-            <span className="text-red-500 text-sm mt-1">{errors.name}</span>
-          )}
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
-              errors.phone ? "border-2 border-red-500" : ""
-            }`}
-            disabled={isSubmitting}
-          />
-          {errors.phone && (
-            <span className="text-red-500 text-sm mt-1">{errors.phone}</span>
-          )}
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
-              errors.email ? "border-2 border-red-500" : ""
-            }`}
-            disabled={isSubmitting}
-          />
-          {errors.email && (
-            <span className="text-red-500 text-sm mt-1">{errors.email}</span>
-          )}
-        </motion.div>
-
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <div className="relative">
-            <select
-              name="servicePlan"
-              value={formData.servicePlan}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
-                errors.servicePlan ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting || !!preSelectedPlan}
-            >
-              <option value="" disabled>
-                Service Plan
-              </option>
-              {serviceOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </div>
-          {errors.servicePlan && (
-            <span className="text-red-500 text-sm mt-1">{errors.servicePlan}</span>
-          )}
-        </motion.div>
-      </div>
-
-      <div className="mb-4">
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <div className="relative">
+    <>
+      <motion.form
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl mx-auto"
+        id="sign-up"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <motion.div variants={itemVariants} className="flex flex-col">
             <input
-              id="address-input"
               type="text"
-              name="address"
-              placeholder="Full Address (e.g., 123 Main St, Cleveland, OH 44113)"
-              value={formData.address}
+              name="name"
+              placeholder="Name"
+              value={formData.name}
               onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 w-full ${
-                errors.address ? "border-2 border-red-500" : 
-                isAddressValid === true ? "border-2 border-green-500" :
-                isAddressValid === false ? "border-2 border-red-500" : ""
+              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+                errors.name ? "border-2 border-red-500" : ""
               }`}
               disabled={isSubmitting}
             />
-            {isAddressValid !== null && (
-              <div className={`absolute right-3 top-4 ${isAddressValid ? 'text-green-500' : 'text-red-500'}`}>
-                {isAddressValid ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
+            {errors.name && (
+              <span className="text-red-500 text-sm mt-1">{errors.name}</span>
+            )}
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone Number"
+              value={formData.phone}
+              onChange={handleChange}
+              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+                errors.phone ? "border-2 border-red-500" : ""
+              }`}
+              disabled={isSubmitting}
+            />
+            {errors.phone && (
+              <span className="text-red-500 text-sm mt-1">{errors.phone}</span>
+            )}
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+                errors.email ? "border-2 border-red-500" : ""
+              }`}
+              disabled={isSubmitting}
+            />
+            {errors.email && (
+              <span className="text-red-500 text-sm mt-1">{errors.email}</span>
+            )}
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <div className="relative">
+              <select
+                name="servicePlan"
+                value={formData.servicePlan}
+                onChange={handleChange}
+                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                  errors.servicePlan ? "border-2 border-red-500" : ""
+                }`}
+                disabled={isSubmitting || !!preSelectedPlan}
+              >
+                <option value="" disabled>
+                  Service Plan
+                </option>
+                {serviceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </div>
+            </div>
+            {errors.servicePlan && (
+              <span className="text-red-500 text-sm mt-1">{errors.servicePlan}</span>
+            )}
+          </motion.div>
+        </div>
+
+        <div className="mb-4">
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <div className="relative">
+              <input
+                id="address-input"
+                type="text"
+                name="address"
+                placeholder="Full Address (e.g., 123 Main St, Parma, OH 44129)"
+                value={formData.address}
+                onChange={handleChange}
+                className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 w-full ${
+                  errors.address ? "border-2 border-red-500" : 
+                  isAddressValid === true ? "border-2 border-green-500" :
+                  isAddressValid === false ? "border-2 border-red-500" : ""
+                }`}
+                disabled={isSubmitting}
+              />
+              {isAddressValid !== null && (
+                <div className={`absolute right-3 top-4 ${isAddressValid ? 'text-green-500' : 'text-red-500'}`}>
+                  {isAddressValid ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+              )}
+            </div>
+            {errors.address && (
+              <span className="text-red-500 text-sm mt-1">{errors.address}</span>
+            )}
+            {addressValidationMessage && (
+              <span className={`text-sm mt-1 ${isAddressValid ? 'text-green-600' : 'text-red-500'}`}>
+                {addressValidationMessage}
+              </span>
+            )}
+            {!isAddressValid && !errors.address && !addressValidationMessage && (
+              <span className="text-gray-500 text-sm mt-1">
+                Type your address and select from suggestions. We serve areas within 18 miles of Parma, Ohio.
+              </span>
+            )}
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <div className="relative">
+              <select
+                name="dayOfPickup"
+                value={formData.dayOfPickup}
+                onChange={handleChange}
+                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                  errors.dayOfPickup ? "border-2 border-red-500" : ""
+                }`}
+                disabled={isSubmitting}
+              >
+                <option value="" disabled>
+                  Day of Trash Pickup
+                </option>
+                {daysOfWeek.map((day) => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            {errors.dayOfPickup && (
+              <span className="text-red-500 text-sm mt-1">{errors.dayOfPickup}</span>
+            )}
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <div className="relative">
+              <select
+                name="timeOfPickup"
+                value={formData.timeOfPickup}
+                onChange={handleChange}
+                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                  errors.timeOfPickup ? "border-2 border-red-500" : ""
+                }`}
+                disabled={isSubmitting}
+              >
+                <option value="" disabled>
+                  Time of Day for Trash Pickup
+                </option>
+                {timeSlots.map((time) => (
+                  <option key={time.value} value={time.value}>
+                    {time.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+            {errors.timeOfPickup && (
+              <span className="text-red-500 text-sm mt-1">{errors.timeOfPickup}</span>
+            )}
+          </motion.div>
+        </div>
+
+        <div className="mb-6">
+          <motion.div variants={itemVariants} className="flex flex-col">
+            <textarea
+              name="message"
+              placeholder="Special Instructions or Notes (Optional)"
+              value={formData.message}
+              onChange={handleChange}
+              rows="12"
+              className="p-4 bg-gray-50 rounded-md focus:outline-none resize-none text-gray-600"
+              disabled={isSubmitting}
+            ></textarea>
+          </motion.div>
+        </div>
+
+        {/* Privacy Policy and Terms of Service Checkbox */}
+        <motion.div variants={itemVariants} className="flex items-start mb-6">
+          <div className="flex items-center h-5">
+            <input
+              id="acceptTerms"
+              name="acceptTerms"
+              type="checkbox"
+              checked={formData.acceptTerms}
+              onChange={handleChange}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              disabled={isSubmitting}
+            />
+          </div>
+          <div className="ml-3 text-sm">
+            <label htmlFor="acceptTerms" className={`font-medium ${errors.acceptTerms ? "text-red-500" : "text-gray-600"}`}>
+              I agree to the{" "}
+              <button
+                type="button"
+                onClick={() => openModal("terms")}
+                className="text-[#37B6FF] hover:underline focus:outline-none"
+              >
+                Terms of Service
+              </button>{" "}
+              and{" "}
+              <button
+                type="button"
+                onClick={() => openModal("privacy")}
+                className="text-[#37B6FF] hover:underline focus:outline-none"
+              >
+                Privacy Policy
+              </button>
+            </label>
+            {errors.acceptTerms && (
+              <p className="text-red-500 text-xs mt-1">{errors.acceptTerms}</p>
             )}
           </div>
-          {errors.address && (
-            <span className="text-red-500 text-sm mt-1">{errors.address}</span>
-          )}
-          {addressValidationMessage && (
-            <span className={`text-sm mt-1 ${isAddressValid ? 'text-green-600' : 'text-red-500'}`}>
-              {addressValidationMessage}
-            </span>
-          )}
-          {!isAddressValid && !errors.address && !addressValidationMessage && (
-            <span className="text-gray-500 text-sm mt-1">
-              Type your address and select from suggestions. We serve Northeast Ohio (Cleveland area).
-            </span>
-          )}
-        </motion.div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <div className="relative">
-            <select
-              name="dayOfPickup"
-              value={formData.dayOfPickup}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
-                errors.dayOfPickup ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting}
-            >
-              <option value="" disabled>
-                Day of Trash Pickup
-              </option>
-              {daysOfWeek.map((day) => (
-                <option key={day.value} value={day.value}>
-                  {day.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </div>
-          {errors.dayOfPickup && (
-            <span className="text-red-500 text-sm mt-1">{errors.dayOfPickup}</span>
-          )}
         </motion.div>
 
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <div className="relative">
-            <select
-              name="timeOfPickup"
-              value={formData.timeOfPickup}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
-                errors.timeOfPickup ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting}
-            >
-              <option value="" disabled>
-                Time of Day for Trash Pickup
-              </option>
-              {timeSlots.map((time) => (
-                <option key={time.value} value={time.value}>
-                  {time.label}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
-              <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </div>
-          {errors.timeOfPickup && (
-            <span className="text-red-500 text-sm mt-1">{errors.timeOfPickup}</span>
-          )}
-        </motion.div>
-      </div>
-
-      <div className="mb-6">
-        <motion.div variants={itemVariants} className="flex flex-col">
-          <textarea
-            name="message"
-            placeholder="Special Instructions or Notes (Optional)"
-            value={formData.message}
-            onChange={handleChange}
-            rows="10"
-            className="p-4 bg-gray-50 rounded-md focus:outline-none resize-none text-gray-600"
-            disabled={isSubmitting}
-          ></textarea>
-        </motion.div>
-      </div>
-
-      <motion.div
-        variants={itemVariants}
-        className="w-full"
-        whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-      >
-        <Button
-          type="submit"
-          className={`w-full py-4 text-lg font-medium ${isSubmitting ? 'opacity-90 cursor-not-allowed' : ''}`}
-          disabled={isSubmitting}
+        <motion.div
+          variants={itemVariants}
+          className="w-full"
+          whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+          whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
         >
-          {isSubmitting ? (
-            <>
-              <svg className="mr-3 inline-block w-5 h-5 animate-spin text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path 
-                  className="opacity-75" 
-                  fill="currentColor" 
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Wait a sec...
-            </>
-          ) : (
-            'Sign Up & Proceed to Payment'
-          )}
-        </Button>
-      </motion.div>
-    </motion.form>
+          <Button
+            type="submit"
+            className={`w-full py-4 text-lg font-medium ${isSubmitting ? 'opacity-90 cursor-not-allowed' : ''}`}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <svg className="mr-3 inline-block w-5 h-5 animate-spin text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path 
+                    className="opacity-75" 
+                    fill="currentColor" 
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Wait a sec...
+              </>
+            ) : (
+              'Sign Up & Proceed to Payment'
+            )}
+          </Button>
+        </motion.div>
+      </motion.form>
+      
+      {/* Privacy and Terms Modal */}
+      <PrivacyTermsModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        activeTab={modalTab}
+      />
+    </>
   );
 };
 
