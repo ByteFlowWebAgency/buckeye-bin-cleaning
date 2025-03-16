@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+
 import { adminAuth } from "@/data/firebase-admin";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY;
@@ -8,7 +9,7 @@ export async function POST(request) {
     const { email, password, secretKey } = await request.json();
     
     if (secretKey !== ADMIN_SECRET) {
-      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
     
     const userRecord = await adminAuth.createUser({
@@ -21,11 +22,11 @@ export async function POST(request) {
     
     return NextResponse.json({ 
       success: true, 
-      message: 'Admin user created successfully',
+      message: "Admin user created successfully",
       uid: userRecord.uid
     });
   } catch (error) {
-    console.error('Error creating admin user:', error);
+    console.error("Error creating admin user:", error);
     return NextResponse.json({ 
       success: false, 
       message: error.message 

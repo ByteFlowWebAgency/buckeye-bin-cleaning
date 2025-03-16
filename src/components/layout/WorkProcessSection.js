@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+
 import ProcessCard from "../ui/ProcessCard";
 import ProcessArrow from "../ui/ProcessArrow";
 import { processSteps } from "../ui/processData";
@@ -32,10 +33,10 @@ const WorkProcess = () => {
     <section id="process" className="py-16 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+          initial={ { opacity: 0, y: -20 } }
+          whileInView={ { opacity: 1, y: 0 } }
+          viewport={ { once: true } }
+          transition={ { duration: 0.7 } }
           className="text-center mb-16"
         >
           <div className="text-left pl-10">
@@ -53,27 +54,27 @@ const WorkProcess = () => {
         <div className="flex justify-center">
           <motion.div
             className="flex flex-wrap justify-center md:flex-nowrap overflow-x-auto pb-6 max-w-full"
-            variants={containerVariants}
+            variants={ containerVariants }
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
-            style={{ gap: "1px" }}
+            viewport={ { once: true } }
+            style={ { gap: "1px" } }
           >
-            {processSteps.map((step, index) => (
+            { processSteps.map((step, index) => (
               <motion.div
-                key={step.id}
+                key={ step.id }
                 className="flex-none mb-8 sm:mb-0 relative"
-                variants={itemVariants}
-                style={{
+                variants={ itemVariants }
+                style={ {
                   marginRight: index < processSteps.length - 1 ? "0" : "0",
-                }}
+                } }
               >
                 <div className="relative">
-                  <ProcessCard step={step} />
-                  {index < processSteps.length - 1 && <ProcessArrow />}
+                  <ProcessCard step={ step } />
+                  { index < processSteps.length - 1 && <ProcessArrow /> }
                 </div>
               </motion.div>
-            ))}
+            )) }
           </motion.div>
         </div>
       </div>

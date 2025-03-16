@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useAuth, AuthProvider } from '@/contexts/AuthContext';
+import { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+
+import { useAuth, AuthProvider } from "@/contexts/AuthContext";
 
 // Admin layout component without the AuthProvider
 function AdminLayout({ children }) {
@@ -11,18 +12,18 @@ function AdminLayout({ children }) {
   const pathname = usePathname();
   
   // Don't redirect if we're already on the login page
-  const isLoginPage = pathname === '/admin/login';
+  const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
     if (!loading && !user && !isLoginPage) {
-      router.push('/admin/login');
+      router.push("/admin/login");
     }
   }, [user, loading, router, isLoginPage]);
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.push('/admin/login');
+      router.push("/admin/login");
     } catch (error) {
       console.error("Sign out error:", error);
     }
@@ -54,7 +55,7 @@ function AdminLayout({ children }) {
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-xl font-bold text-gray-900">Buckeye Bin Cleaning Admin</h1>
           <button 
-            onClick={handleSignOut}
+            onClick={ handleSignOut }
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
           >
             Sign Out
@@ -63,7 +64,7 @@ function AdminLayout({ children }) {
       </header>
       <main>
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {children}
+          { children }
         </div>
       </main>
     </div>
@@ -74,7 +75,7 @@ function AdminLayout({ children }) {
 export default function AdminLayoutWithAuth({ children }) {
   return (
     <AuthProvider>
-      <AdminLayout>{children}</AdminLayout>
+      <AdminLayout>{ children }</AdminLayout>
     </AuthProvider>
   );
 }

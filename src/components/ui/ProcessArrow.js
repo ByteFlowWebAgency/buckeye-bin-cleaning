@@ -21,12 +21,12 @@ const ProcessArrow = () => {
   return (
     <motion.div
       className="hidden md:flex items-center justify-center absolute z-10"
-      variants={arrowVariants}
-      style={{
+      variants={ arrowVariants }
+      style={ {
         right: "-38px",
         top: "50%",
         transform: "translateY(-50%)",
-      }}
+      } }
     >
       <MdKeyboardArrowRight className="text-[#37B6FF] text-6xl font-bold" />
     </motion.div>

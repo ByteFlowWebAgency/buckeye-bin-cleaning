@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { z } from "zod";
-import Button from "./Button";
 import Swal from "sweetalert2";
+
+import Button from "./Button";
 import PrivacyTermsModal from "./PrivacyTermsModal";
 
 const formSchema = z.object({
@@ -85,14 +86,14 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
   useEffect(() => {
     const setupAutocomplete = () => {
       if (window.google && window.google.maps && window.google.maps.places) {
-        const input = document.getElementById('address-input');
+        const input = document.getElementById("address-input");
         if (input) {
           const autocomplete = new window.google.maps.places.Autocomplete(input, {
-            componentRestrictions: { country: 'us' },
-            fields: ['address_components', 'formatted_address', 'geometry'],
+            componentRestrictions: { country: "us" },
+            fields: ["address_components", "formatted_address", "geometry"],
           });
           
-          autocomplete.addListener('place_changed', () => {
+          autocomplete.addListener("place_changed", () => {
             const place = autocomplete.getPlace();
             if (place.formatted_address) {
               setFormData(prev => ({
@@ -124,21 +125,21 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
   useEffect(() => {
     const handleFormFieldChange = (e) => {
-      if (e.target.name === 'servicePlan') {
+      if (e.target.name === "servicePlan") {
         if (formData.servicePlan !== e.target.value) {
           setFormData(prev => ({ ...prev, servicePlan: e.target.value }));
         }
       }
     };
     
-    const formElement = document.getElementById('sign-up');
+    const formElement = document.getElementById("sign-up");
     if (formElement) {
-      formElement.addEventListener('change', handleFormFieldChange);
+      formElement.addEventListener("change", handleFormFieldChange);
     }
     
     return () => {
       if (formElement) {
-        formElement.removeEventListener('change', handleFormFieldChange);
+        formElement.removeEventListener("change", handleFormFieldChange);
       }
     };
   }, [formData.servicePlan]);
@@ -153,7 +154,7 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
     
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
 
     // Clear error for this field if it exists
@@ -173,10 +174,10 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
   const validateAddress = async () => {
     try {
-      const response = await fetch('/api/validate-location', {
-        method: 'POST',
+      const response = await fetch("/api/validate-location", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ address: formData.address }),
       });
@@ -191,12 +192,12 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
       if (!data.isWithinServiceArea) {
         setIsAddressValid(false);
-        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${data.distance} miles from Parma). We currently only serve locations within 18 miles of Parma, Ohio.`);
+        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${ data.distance } miles from Parma). We currently only serve locations within 18 miles of Parma, Ohio.`);
         return false;
       }
 
       setIsAddressValid(true);
-      setAddressValidationMessage(`Address validated! You're ${data.distance} miles from our service center in Parma.`);
+      setAddressValidationMessage(`Address validated! You're ${ data.distance } miles from our service center in Parma.`);
       
       setFormData(prev => ({
         ...prev,
@@ -219,10 +220,10 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
       // Strip the acceptTerms field before sending to the checkout API
       const { acceptTerms, ...checkoutData } = formData;
       
-      const response = await fetch('/api/create-checkout', {
-        method: 'POST',
+      const response = await fetch("/api/create-checkout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(checkoutData),
       });
@@ -331,86 +332,86 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
   return (
     <>
       <motion.form
-        variants={formVariants}
+        variants={ formVariants }
         initial="hidden"
         animate="visible"
-        onSubmit={handleSubmit}
+        onSubmit={ handleSubmit }
         className="w-full max-w-2xl mx-auto"
         id="sign-up"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <input
               type="text"
               name="name"
               placeholder="Name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+              value={ formData.name }
+              onChange={ handleChange }
+              className={ `p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
                 errors.name ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting}
+              }` }
+              disabled={ isSubmitting }
             />
-            {errors.name && (
-              <span className="text-red-500 text-sm mt-1">{errors.name}</span>
-            )}
+            { errors.name && (
+              <span className="text-red-500 text-sm mt-1">{ errors.name }</span>
+            ) }
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <input
               type="tel"
               name="phone"
               placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+              value={ formData.phone }
+              onChange={ handleChange }
+              className={ `p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
                 errors.phone ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting}
+              }` }
+              disabled={ isSubmitting }
             />
-            {errors.phone && (
-              <span className="text-red-500 text-sm mt-1">{errors.phone}</span>
-            )}
+            { errors.phone && (
+              <span className="text-red-500 text-sm mt-1">{ errors.phone }</span>
+            ) }
           </motion.div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <input
               type="email"
               name="email"
               placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
+              value={ formData.email }
+              onChange={ handleChange }
+              className={ `p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 ${
                 errors.email ? "border-2 border-red-500" : ""
-              }`}
-              disabled={isSubmitting}
+              }` }
+              disabled={ isSubmitting }
             />
-            {errors.email && (
-              <span className="text-red-500 text-sm mt-1">{errors.email}</span>
-            )}
+            { errors.email && (
+              <span className="text-red-500 text-sm mt-1">{ errors.email }</span>
+            ) }
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <div className="relative">
               <select
                 name="servicePlan"
-                value={formData.servicePlan}
-                onChange={handleChange}
-                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                value={ formData.servicePlan }
+                onChange={ handleChange }
+                className={ `p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
                   errors.servicePlan ? "border-2 border-red-500" : ""
-                }`}
-                disabled={isSubmitting || !!preSelectedPlan}
+                }` }
+                disabled={ isSubmitting || !!preSelectedPlan }
               >
                 <option value="" disabled>
                   Service Plan
                 </option>
-                {serviceOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                { serviceOptions.map((option) => (
+                  <option key={ option.value } value={ option.value }>
+                    { option.label }
                   </option>
-                ))}
+                )) }
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
                 <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -418,79 +419,79 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
                 </svg>
               </div>
             </div>
-            {errors.servicePlan && (
-              <span className="text-red-500 text-sm mt-1">{errors.servicePlan}</span>
-            )}
+            { errors.servicePlan && (
+              <span className="text-red-500 text-sm mt-1">{ errors.servicePlan }</span>
+            ) }
           </motion.div>
         </div>
 
         <div className="mb-4">
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <div className="relative">
               <input
                 id="address-input"
                 type="text"
                 name="address"
                 placeholder="Full Address (e.g., 123 Main St, Parma, OH 44129)"
-                value={formData.address}
-                onChange={handleChange}
-                className={`p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 w-full ${
+                value={ formData.address }
+                onChange={ handleChange }
+                className={ `p-4 bg-gray-50 rounded-md focus:outline-none text-gray-600 w-full ${
                   errors.address ? "border-2 border-red-500" : 
-                  isAddressValid === true ? "border-2 border-green-500" :
-                  isAddressValid === false ? "border-2 border-red-500" : ""
-                }`}
-                disabled={isSubmitting}
+                    isAddressValid === true ? "border-2 border-green-500" :
+                      isAddressValid === false ? "border-2 border-red-500" : ""
+                }` }
+                disabled={ isSubmitting }
               />
-              {isAddressValid !== null && (
-                <div className={`absolute right-3 top-4 ${isAddressValid ? 'text-green-500' : 'text-red-500'}`}>
-                  {isAddressValid ? (
+              { isAddressValid !== null && (
+                <div className={ `absolute right-3 top-4 ${ isAddressValid ? "text-green-500" : "text-red-500" }` }>
+                  { isAddressValid ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={ 2 } d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={ 2 } d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                  )}
+                  ) }
                 </div>
-              )}
+              ) }
             </div>
-            {errors.address && (
-              <span className="text-red-500 text-sm mt-1">{errors.address}</span>
-            )}
-            {addressValidationMessage && (
-              <span className={`text-sm mt-1 ${isAddressValid ? 'text-green-600' : 'text-red-500'}`}>
-                {addressValidationMessage}
+            { errors.address && (
+              <span className="text-red-500 text-sm mt-1">{ errors.address }</span>
+            ) }
+            { addressValidationMessage && (
+              <span className={ `text-sm mt-1 ${ isAddressValid ? "text-green-600" : "text-red-500" }` }>
+                { addressValidationMessage }
               </span>
-            )}
-            {!isAddressValid && !errors.address && !addressValidationMessage && (
+            ) }
+            { !isAddressValid && !errors.address && !addressValidationMessage && (
               <span className="text-gray-500 text-sm mt-1">
                 Type your address and select from suggestions. We serve areas within 18 miles of Parma, Ohio.
               </span>
-            )}
+            ) }
           </motion.div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <div className="relative">
               <select
                 name="dayOfPickup"
-                value={formData.dayOfPickup}
-                onChange={handleChange}
-                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                value={ formData.dayOfPickup }
+                onChange={ handleChange }
+                className={ `p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
                   errors.dayOfPickup ? "border-2 border-red-500" : ""
-                }`}
-                disabled={isSubmitting}
+                }` }
+                disabled={ isSubmitting }
               >
                 <option value="" disabled>
                   Day of Trash Pickup
                 </option>
-                {daysOfWeek.map((day) => (
-                  <option key={day.value} value={day.value}>
-                    {day.label}
+                { daysOfWeek.map((day) => (
+                  <option key={ day.value } value={ day.value }>
+                    { day.label }
                   </option>
-                ))}
+                )) }
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
                 <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -498,30 +499,30 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
                 </svg>
               </div>
             </div>
-            {errors.dayOfPickup && (
-              <span className="text-red-500 text-sm mt-1">{errors.dayOfPickup}</span>
-            )}
+            { errors.dayOfPickup && (
+              <span className="text-red-500 text-sm mt-1">{ errors.dayOfPickup }</span>
+            ) }
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <div className="relative">
               <select
                 name="timeOfPickup"
-                value={formData.timeOfPickup}
-                onChange={handleChange}
-                className={`p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
+                value={ formData.timeOfPickup }
+                onChange={ handleChange }
+                className={ `p-4 bg-gray-50 rounded-md focus:outline-none w-full text-gray-600 appearance-none ${
                   errors.timeOfPickup ? "border-2 border-red-500" : ""
-                }`}
-                disabled={isSubmitting}
+                }` }
+                disabled={ isSubmitting }
               >
                 <option value="" disabled>
                   Time of Day for Trash Pickup
                 </option>
-                {timeSlots.map((time) => (
-                  <option key={time.value} value={time.value}>
-                    {time.label}
+                { timeSlots.map((time) => (
+                  <option key={ time.value } value={ time.value }>
+                    { time.label }
                   </option>
-                ))}
+                )) }
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
                 <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -529,76 +530,76 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
                 </svg>
               </div>
             </div>
-            {errors.timeOfPickup && (
-              <span className="text-red-500 text-sm mt-1">{errors.timeOfPickup}</span>
-            )}
+            { errors.timeOfPickup && (
+              <span className="text-red-500 text-sm mt-1">{ errors.timeOfPickup }</span>
+            ) }
           </motion.div>
         </div>
 
         <div className="mb-6">
-          <motion.div variants={itemVariants} className="flex flex-col">
+          <motion.div variants={ itemVariants } className="flex flex-col">
             <textarea
               name="message"
               placeholder="Special Instructions or Notes (Optional)"
-              value={formData.message}
-              onChange={handleChange}
+              value={ formData.message }
+              onChange={ handleChange }
               rows="12"
               className="p-4 bg-gray-50 rounded-md focus:outline-none resize-none text-gray-600"
-              disabled={isSubmitting}
+              disabled={ isSubmitting }
             ></textarea>
           </motion.div>
         </div>
 
-        {/* Privacy Policy and Terms of Service Checkbox */}
-        <motion.div variants={itemVariants} className="flex items-start mb-6">
+        { /* Privacy Policy and Terms of Service Checkbox */ }
+        <motion.div variants={ itemVariants } className="flex items-start mb-6">
           <div className="flex items-center h-5">
             <input
               id="acceptTerms"
               name="acceptTerms"
               type="checkbox"
-              checked={formData.acceptTerms}
-              onChange={handleChange}
+              checked={ formData.acceptTerms }
+              onChange={ handleChange }
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              disabled={isSubmitting}
+              disabled={ isSubmitting }
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="acceptTerms" className={`font-medium ${errors.acceptTerms ? "text-red-500" : "text-gray-600"}`}>
-              I agree to the{" "}
+            <label htmlFor="acceptTerms" className={ `font-medium ${ errors.acceptTerms ? "text-red-500" : "text-gray-600" }` }>
+              I agree to the{ " " }
               <button
                 type="button"
-                onClick={() => openModal("terms")}
+                onClick={ () => openModal("terms") }
                 className="text-[#37B6FF] hover:underline focus:outline-none"
               >
                 Terms of Service
-              </button>{" "}
-              and{" "}
+              </button>{ " " }
+              and{ " " }
               <button
                 type="button"
-                onClick={() => openModal("privacy")}
+                onClick={ () => openModal("privacy") }
                 className="text-[#37B6FF] hover:underline focus:outline-none"
               >
                 Privacy Policy
               </button>
             </label>
-            {errors.acceptTerms && (
-              <p className="text-red-500 text-xs mt-1">{errors.acceptTerms}</p>
-            )}
+            { errors.acceptTerms && (
+              <p className="text-red-500 text-xs mt-1">{ errors.acceptTerms }</p>
+            ) }
           </div>
         </motion.div>
 
         <motion.div
-          variants={itemVariants}
+          variants={ itemVariants }
           className="w-full"
-          whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-          whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+          whileHover={ { scale: isSubmitting ? 1 : 1.02 } }
+          whileTap={ { scale: isSubmitting ? 1 : 0.98 } }
         >
           <Button
             type="submit"
-            className={`w-full py-4 text-lg font-medium ${isSubmitting ? 'opacity-90 cursor-not-allowed' : ''}`}
-            disabled={isSubmitting}
+            className={ `w-full py-4 text-lg font-medium ${ isSubmitting ? "opacity-90 cursor-not-allowed" : "" }` }
+            disabled={ isSubmitting }
           >
-            {isSubmitting ? (
+            { isSubmitting ? (
               <>
                 <svg className="mr-3 inline-block w-5 h-5 animate-spin text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -611,17 +612,17 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
                 Wait a sec...
               </>
             ) : (
-              'Sign Up & Proceed to Payment'
-            )}
+              "Sign Up & Proceed to Payment"
+            ) }
           </Button>
         </motion.div>
       </motion.form>
       
-      {/* Privacy and Terms Modal */}
+      { /* Privacy and Terms Modal */ }
       <PrivacyTermsModal 
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        activeTab={modalTab}
+        isOpen={ modalOpen }
+        onClose={ () => setModalOpen(false) }
+        activeTab={ modalTab }
       />
     </>
   );

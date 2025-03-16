@@ -37,19 +37,19 @@ export async function POST(request) {
     if (!searchAddress.match(/\d{5}/) && 
         !searchAddress.toLowerCase().includes("cleveland") && 
         !searchAddress.toLowerCase().includes("parma")) {
-      searchAddress += ', Parma area';
+      searchAddress += ", Parma area";
     }
     
     // Using native fetch instead of axios for stability
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(searchAddress)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${ encodeURIComponent(searchAddress) }&key=${ process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }`
     );
     
     const data = await response.json();
     
     console.log("Geocoding response status:", data.status);
     
-    if (data.status !== 'OK' || !data.results.length) {
+    if (data.status !== "OK" || !data.results.length) {
       return NextResponse.json(
         { 
           success: false, 

@@ -1,6 +1,7 @@
 import React from "react";
-import Section from "../layout/Section";
 import Image from "next/image";
+
+import Section from "../layout/Section";
 import BuckeyeBinCleaningLogo from "../../../public/assets/images/BuckeyeBinCleaningLogo.png";
 import Phone from "../../../public/assets/images/phone.svg";
 import Email from "../../../public/assets/images/mail.svg";
@@ -20,7 +21,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 items-start">
           <div className="mb-6 sm:mb-0">
             <Image
-              src={BuckeyeBinCleaningLogo}
+              src={ BuckeyeBinCleaningLogo }
               alt="Buckeye Bin Cleaning Logo"
               className="w-16 sm:w-20 mb-3 sm:mb-4"
             />
@@ -37,7 +38,7 @@ const Footer = () => {
                 className="inline-block hover:opacity-80 transition-opacity"
               >
                 <Image
-                  src={FacebookIcon}
+                  src={ FacebookIcon }
                   alt="Facebook icon"
                   className="w-4 h-4"
                 />
@@ -53,7 +54,7 @@ const Footer = () => {
                   <a
                     href="/"
                     aria-label="Home"
-                    onClick={(e) => {e.preventDefault(); scrollToSection("home")}}
+                    onClick={ (e) => { e.preventDefault(); scrollToSection("home"); } }
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     Home
@@ -63,7 +64,7 @@ const Footer = () => {
                   <a
                     href="#process"
                     aria-label="Process"
-                    onClick={(e) => {e.preventDefault(); scrollToSection("process")}}
+                    onClick={ (e) => { e.preventDefault(); scrollToSection("process"); } }
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     Process
@@ -73,7 +74,7 @@ const Footer = () => {
                   <a
                     href="#services"
                     aria-label="Service"
-                    onClick={(e) => {e.preventDefault(); scrollToSection("services")}}
+                    onClick={ (e) => { e.preventDefault(); scrollToSection("services"); } }
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     Service
@@ -83,7 +84,7 @@ const Footer = () => {
                   <a
                     href="#about-us"
                     aria-label="About Us"
-                    onClick={(e) => {e.preventDefault(); scrollToSection("about-us")}}
+                    onClick={ (e) => { e.preventDefault(); scrollToSection("about-us"); } }
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     About Us
@@ -93,7 +94,7 @@ const Footer = () => {
                   <a
                     href="#contact-us"
                     aria-label="Contact Us"
-                    onClick={(e) => {e.preventDefault(); scrollToSection("contact-us")}}
+                    onClick={ (e) => { e.preventDefault(); scrollToSection("contact-us"); } }
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     Contact Us
@@ -107,18 +108,18 @@ const Footer = () => {
             <h3 className="text-[#37B6FF] font-semibold text-sm sm:text-base">CONTACT</h3>
             <ul className="mt-2 space-y-2 sm:space-y-4 text-gray-600 text-xs sm:text-sm">
               <li className="flex items-center space-x-2">
-                <Image src={Phone} alt="Phone icon" className="w-4 h-4 flex-shrink-0" />
+                <Image src={ Phone } alt="Phone icon" className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  Tel:{" "}
+                  Tel:{ " " }
                   <a href="tel:440-781-5527" className="text-[#37B6FF] hover:underline">
                     440-781-5527
                   </a>
                 </span>
               </li>
               <li className="flex items-center space-x-2">
-                <Image src={Email} alt="Email icon" className="w-4 h-4 flex-shrink-0" />
+                <Image src={ Email } alt="Email icon" className="w-4 h-4 flex-shrink-0" />
                 <span className="break-all">
-                  Mail:{" "}
+                  Mail:{ " " }
                   <a
                     href="mailto:Buckeyebincleaning@gmail.com"
                     className="text-[#37B6FF] hover:underline"
@@ -134,7 +135,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-16 mt-6 sm:mt-8 pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center text-gray-600 text-xs sm:text-sm">
           <div className="flex items-center mb-2 sm:mb-0">
             <p>
-              Terms of Use | Created By{" "}
+              Terms of Use | Created By{ " " }
               <a href="https://www.byteflow.us" className="hover:text-blue-500 transition-colors" target="_blank" rel="noopener noreferrer">
                 BYTEFLOW
               </a>

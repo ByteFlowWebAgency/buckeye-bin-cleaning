@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
+
 import { adminDb } from "@/data/firebase-admin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -8,7 +9,7 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 // Create reusable transporter object using Gmail
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD,
@@ -68,8 +69,8 @@ export async function POST(request) {
   try {
     event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
   } catch (err) {
-    console.error(`⚠️ Webhook signature verification failed: ${err.message}`);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+    console.error(`⚠️ Webhook signature verification failed: ${ err.message }`);
+    return NextResponse.json({ error: `Webhook Error: ${ err.message }` }, { status: 400 });
   }
   
   if (event.type === "checkout.session.completed") {
@@ -113,7 +114,7 @@ export async function POST(request) {
           }
         }
       } catch (error) {
-        console.error('Error fetching line items:', error);
+        console.error("Error fetching line items:", error);
       }
     }
     
@@ -135,7 +136,7 @@ export async function POST(request) {
         servicePlanDisplay = "Buckeye Summer Package ($100)";
       } else {
         servicePlan = "custom";
-        servicePlanDisplay = `Custom Service ($${amount.toFixed(2)})`;
+        servicePlanDisplay = `Custom Service ($${ amount.toFixed(2) })`;
       }
       console.log("Service plan determined from amount:", servicePlan);
     }
@@ -185,34 +186,34 @@ export async function POST(request) {
       };
       
       await adminDb.collection("orders").add(orderData);
-      console.log('✅ Order saved to Firestore database');
+      console.log("✅ Order saved to Firestore database");
     } catch (dbError) {
-      console.error('❌ Error saving order to database - message:', dbError.message);
-      console.error('❌ Error saving order to database - code:', dbError.code);
+      console.error("❌ Error saving order to database - message:", dbError.message);
+      console.error("❌ Error saving order to database - code:", dbError.code);
     }
 
     try {
       // Send confirmation to customer
       await transporter.sendMail({
-        from: `"Buckeye Bin Cleaning" <${process.env.EMAIL_USER}>`,
+        from: `"Buckeye Bin Cleaning" <${ process.env.EMAIL_USER }>`,
         to: session.customer_email,
-        subject: 'Your Buckeye Bin Cleaning Order Confirmation',
+        subject: "Your Buckeye Bin Cleaning Order Confirmation",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #ed1c24;">Thank You for Your Order!</h2>
-            <p>Hello ${orderDetails.name},</p>
+            <p>Hello ${ orderDetails.name },</p>
             <p>Your bin cleaning service has been scheduled successfully. Here are your order details:</p>
             
             <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
-              <p><strong>Service Plan:</strong> ${orderDetails.servicePlan}</p>
-              <p><strong>Service Address:</strong> ${orderDetails.address}</p>
-              <p><strong>Pickup Schedule:</strong> ${orderDetails.dayOfPickup}, ${orderDetails.timeOfPickup}</p>
-              <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
+              <p><strong>Order ID:</strong> ${ orderDetails.orderId }</p>
+              <p><strong>Service Plan:</strong> ${ orderDetails.servicePlan }</p>
+              <p><strong>Service Address:</strong> ${ orderDetails.address }</p>
+              <p><strong>Pickup Schedule:</strong> ${ orderDetails.dayOfPickup }, ${ orderDetails.timeOfPickup }</p>
+              <p><strong>Total Paid:</strong> $${ orderDetails.amount }</p>
             </div>
             
             <p>Our team will service your bins on your next trash pickup day.</p>
-            <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (440) 781-5527.</p>
+            <p>If you need to make any changes or have questions, please contact us at ${ process.env.EMAIL_USER } or call (440) 781-5527.</p>
             
             <p>Thank you for choosing Buckeye Bin Cleaning!</p>
           </div>
@@ -221,24 +222,24 @@ export async function POST(request) {
       
       // Send notification to business owner
       await transporter.sendMail({
-        from: `"Buckeye Bin Cleaning System" <${process.env.EMAIL_USER}>`,
+        from: `"Buckeye Bin Cleaning System" <${ process.env.EMAIL_USER }>`,
         to: process.env.OWNER_EMAIL,
-        subject: 'New Bin Cleaning Order',
+        subject: "New Bin Cleaning Order",
         html: `
           <div style="font-family: Arial, sans-serif;">
             <h2 style="color: #ed1c24;">New Order Received!</h2>
             <p>A new bin cleaning order has been placed:</p>
             
             <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
-              <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
-              <p><strong>Customer:</strong> ${orderDetails.name}</p>
-              <p><strong>Email:</strong> ${orderDetails.email}</p>
-              <p><strong>Phone:</strong> ${orderDetails.phone}</p>
-              <p><strong>Service Plan:</strong> ${orderDetails.servicePlan}</p>
-              <p><strong>Service Address:</strong> ${orderDetails.address}</p>
-              <p><strong>Pickup Schedule:</strong> ${orderDetails.dayOfPickup}, ${orderDetails.timeOfPickup}</p>
-              <p><strong>Special Instructions:</strong> ${orderDetails.message}</p>
-              <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
+              <p><strong>Order ID:</strong> ${ orderDetails.orderId }</p>
+              <p><strong>Customer:</strong> ${ orderDetails.name }</p>
+              <p><strong>Email:</strong> ${ orderDetails.email }</p>
+              <p><strong>Phone:</strong> ${ orderDetails.phone }</p>
+              <p><strong>Service Plan:</strong> ${ orderDetails.servicePlan }</p>
+              <p><strong>Service Address:</strong> ${ orderDetails.address }</p>
+              <p><strong>Pickup Schedule:</strong> ${ orderDetails.dayOfPickup }, ${ orderDetails.timeOfPickup }</p>
+              <p><strong>Special Instructions:</strong> ${ orderDetails.message }</p>
+              <p><strong>Total Paid:</strong> $${ orderDetails.amount }</p>
             </div>
             
             <p>This order has been added to the schedule.</p>
@@ -246,9 +247,9 @@ export async function POST(request) {
         `
       });
       
-      console.log('📧 Order confirmation emails sent successfully');
+      console.log("📧 Order confirmation emails sent successfully");
     } catch (emailError) {
-      console.error('❌ Error sending confirmation emails:', emailError);
+      console.error("❌ Error sending confirmation emails:", emailError);
     }
   }
   

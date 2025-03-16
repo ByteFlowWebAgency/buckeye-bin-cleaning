@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+
 import Button from "@/components/ui/Button";
 
 export default function CancelPage() {
@@ -12,7 +13,7 @@ export default function CancelPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
         <div className="text-center">
-          {refunded ? (
+          { refunded ? (
             // Show for refund confirmation
             <>
               <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -33,22 +34,22 @@ export default function CancelPage() {
               <h1 className="text-2xl font-bold text-gray-800 mb-4">Payment Cancelled</h1>
               <p className="text-gray-600 mb-6">Your bin cleaning service order was not completed. No payment has been processed.</p>
             </>
-          )}
+          ) }
           
           <div className="space-y-4">
             <Link href="/#contact-us" passHref>
               <Button className="w-full">
-                {refunded ? 'Need Help?' : 'Try Again'}
+                { refunded ? "Need Help?" : "Try Again" }
               </Button>
             </Link>
             <div className="ml-2 py-2">
-            <Link href="/" passHref className="block w-full sm:w-auto">
-              <button
-                className="w-full py-2 bg-white text-red-800 border-2 border-red-600 rounded-lg font-medium transition-all duration-300 ease-in-out hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
-              >
+              <Link href="/" passHref className="block w-full sm:w-auto">
+                <button
+                  className="w-full py-2 bg-white text-red-800 border-2 border-red-600 rounded-lg font-medium transition-all duration-300 ease-in-out hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2"
+                >
                 Return to Home
-              </button>
-            </Link>
+                </button>
+              </Link>
             </div>
           </div>
         </div>

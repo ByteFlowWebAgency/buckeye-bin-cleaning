@@ -1,7 +1,9 @@
 import React from "react";
-import Section from "./Section";
-import ServiceCard from "../ui/ServiceCards";
 import { motion } from "framer-motion";
+
+import ServiceCard from "../ui/ServiceCards";
+
+import Section from "./Section";
 
 const servicePlans = [
   {
@@ -50,32 +52,32 @@ const Services = () => {
       <div className="container px-6 mx-auto">
         <motion.h1
           className="text-white font-bold text-5xl py-12 text-center lg:text-left xl:text-left"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={ { opacity: 0, y: -20 } }
+          animate={ { opacity: 1, y: 0 } }
+          transition={ { duration: 0.6, ease: "easeOut" } }
         >
           Our Service Plans
         </motion.h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {servicePlans.map((plan, index) => (
+          { servicePlans.map((plan, index) => (
             <motion.div
-              key={plan.id}
-              variants={cardVariants}
+              key={ plan.id }
+              variants={ cardVariants }
               initial="hidden"
               animate="visible"
               whileHover="hover"
-              custom={index}
+              custom={ index }
             >
               <ServiceCard
-                id={plan.id}
-                serviceType={plan.serviceType}
-                price={plan.price}
-                duration={plan.duration}
-                numberOfcans={plan.numberOfcans}
+                id={ plan.id }
+                serviceType={ plan.serviceType }
+                price={ plan.price }
+                duration={ plan.duration }
+                numberOfcans={ plan.numberOfcans }
               />
             </motion.div>
-          ))}
+          )) }
         </div>
       </div>
     </Section>

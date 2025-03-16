@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+
 import BuckeyeBinCleaningLogo from "../../../public/assets/images/BuckeyeBinCleaningLogo.png";
 import Section from "../layout/Section";
 
@@ -27,64 +28,64 @@ const Navbar = () => {
           <a
             href="/"
             aria-label="Home"
-            onClick={() => scrollToSection("home")}
+            onClick={ () => scrollToSection("home") }
             className="-left-4 md:-left-10 lg:-left-16"
           >
             <Image
-              src={BuckeyeBinCleaningLogo}
+              src={ BuckeyeBinCleaningLogo }
               alt="Buckeye Bin Cleaning Logo"
-              width={100}
-              height={100}
+              width={ 100 }
+              height={ 100 }
               className="transition-opacity hover:opacity-80"
               priority
             />
           </a>
 
           <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={ () => setIsMenuOpen(!isMenuOpen) }
             className="z-50 md:hidden text-white absolute right-0"
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? (
+            { isMenuOpen ? (
               <X className="h-6 w-6 text-white" />
             ) : (
               <Menu className="h-6 w-6 text-white" />
-            )}
+            ) }
           </button>
 
           <nav className="hidden md:flex items-center gap-8 text-white mx-auto">
-            {["Home", "Process", "Services", "About Us", "Contact Us"].map(
+            { ["Home", "Process", "Services", "About Us", "Contact Us"].map(
               (item) => (
                 <button
-                  key={item}
-                  onClick={() =>
+                  key={ item }
+                  onClick={ () =>
                     scrollToSection(item.toLowerCase().replace(/\s+/g, "-"))
                   }
                   className="font-medium text-white transition-opacity hover:opacity-80"
                 >
-                  {item}
+                  { item }
                 </button>
               )
-            )}
+            ) }
           </nav>
 
-          {isMenuOpen && (
+          { isMenuOpen && (
             <nav className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center space-y-6 z-40">
-              {["Home", "Process", "Services", "About Us", "Contact Us"].map(
+              { ["Home", "Process", "Services", "About Us", "Contact Us"].map(
                 (item) => (
                   <button
-                    key={item}
-                    onClick={() =>
+                    key={ item }
+                    onClick={ () =>
                       scrollToSection(item.toLowerCase().replace(/\s+/g, "-"))
                     }
                     className="text-2xl text-white font-medium transition-opacity hover:opacity-80"
                   >
-                    {item}
+                    { item }
                   </button>
                 )
-              )}
+              ) }
             </nav>
-          )}
+          ) }
         </div>
       </header>
     </Section>

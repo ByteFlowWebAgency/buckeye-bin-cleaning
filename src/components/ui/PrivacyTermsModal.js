@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import Button from "./Button";
 
 const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
@@ -38,47 +39,47 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      { isOpen && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
-          onClick={onClose}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          onClick={ onClose }
+          initial={ { opacity: 0 } }
+          animate={ { opacity: 1 } }
+          exit={ { opacity: 0 } }
         >
           <motion.div
             className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
-            onClick={handleModalClick}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", duration: 0.5 }}
+            onClick={ handleModalClick }
+            initial={ { scale: 0.9, opacity: 0 } }
+            animate={ { scale: 1, opacity: 1 } }
+            exit={ { scale: 0.9, opacity: 0 } }
+            transition={ { type: "spring", duration: 0.5 } }
           >
             <div className="flex justify-between items-center border-b border-gray-200 px-6 py-4">
               <div className="flex space-x-4">
                 <button
-                  className={`py-2 font-medium text-sm ${
+                  className={ `py-2 font-medium text-sm ${
                     currentTab === "privacy"
                       ? "text-[#37B6FF] border-b-2 border-[#37B6FF]"
                       : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setCurrentTab("privacy")}
+                  }` }
+                  onClick={ () => setCurrentTab("privacy") }
                 >
                   Privacy Policy
                 </button>
                 <button
-                  className={`py-2 font-medium text-sm ${
+                  className={ `py-2 font-medium text-sm ${
                     currentTab === "terms"
                       ? "text-[#37B6FF] border-b-2 border-[#37B6FF]"
                       : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setCurrentTab("terms")}
+                  }` }
+                  onClick={ () => setCurrentTab("terms") }
                 >
                   Terms of Service
                 </button>
               </div>
               <button
-                onClick={onClose}
+                onClick={ onClose }
                 className="text-gray-500 hover:text-gray-700 transition-colors"
                 aria-label="Close modal"
               >
@@ -92,7 +93,7 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth={ 2 }
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
@@ -100,7 +101,7 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
             </div>
 
             <div className="p-6 overflow-y-auto flex-grow">
-              {currentTab === "privacy" ? (
+              { currentTab === "privacy" ? (
                 <div className="space-y-4">
                   <h2 className="text-xl font-bold text-gray-800">
                     Privacy Policy
@@ -260,12 +261,12 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
                     Phone: 440-781-5527
                   </p>
                 </div>
-              )}
+              ) }
             </div>
 
             <div className="border-t border-gray-200 px-6 py-4">
               <Button
-                onClick={onClose}
+                onClick={ onClose }
                 className="w-full bg-[#37B6FF] hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors"
               >
                 Close
@@ -273,7 +274,7 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
             </div>
           </motion.div>
         </motion.div>
-      )}
+      ) }
     </AnimatePresence>
   );
 };

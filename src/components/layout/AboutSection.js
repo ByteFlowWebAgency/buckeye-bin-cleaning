@@ -1,10 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import AboutUsImage1 from "../../../public/assets/images/about-us-cleaning.png";
-import AboutUsImage2 from "../../../public/assets/images/about-us-cleaning2.png";
-import Section from "./Section";
+
 import CleanedBin from "../../../public/assets/images/buckeyebincleaningimage.jpg";
+
+import Section from "./Section";
 
 const AboutSection = () => {
   const fadeInLeft = {
@@ -41,12 +41,12 @@ const AboutSection = () => {
           className="block lg:hidden mb-6"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
+          viewport={ { once: true } }
+          variants={ fadeInUp }
         >
           <motion.h2
             className="text-3xl md:text-4xl font-bold text-center"
-            variants={fadeInUp}
+            variants={ fadeInUp }
           >
             ABOUT US
           </motion.h2>
@@ -57,15 +57,15 @@ const AboutSection = () => {
             className="w-full lg:w-5/12 mb-8 lg:mb-0"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInLeft}
+            viewport={ { once: true, margin: "-100px" } }
+            variants={ fadeInLeft }
           >
             <div className="relative rounded-lg overflow-hidden shadow-sm">
               <Image
-                src={CleanedBin}
+                src={ CleanedBin }
                 alt="Buckeye Bin Cleaning Team"
-                width={550}
-                height={700}
+                width={ 550 }
+                height={ 700 }
                 className="w-full h-auto object-cover"
                 priority
               />
@@ -76,18 +76,18 @@ const AboutSection = () => {
             className="w-full lg:w-7/12"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInRight}
+            viewport={ { once: true, margin: "-100px" } }
+            variants={ fadeInRight }
           >
             <motion.h2
               className="hidden lg:block text-3xl md:text-4xl lg:text-5xl font-bold mb-5 md:mb-6"
-              variants={fadeInUp}
+              variants={ fadeInUp }
             >
               ABOUT US
             </motion.h2>
             <motion.p
               className="text-gray-700 text-base md:text-lg mb-20 leading-relaxed"
-              variants={fadeInUp}
+              variants={ fadeInUp }
             >
               <strong>Welcome to Buckeye Bin Cleaning!</strong> We are your
               premier trash bin cleaning company dedicated to keeping your bins
@@ -102,10 +102,10 @@ const AboutSection = () => {
 
             <motion.p
               className="text-gray-700 text-base md:text-lg leading-relaxed"
-              variants={fadeInUp}
+              variants={ fadeInUp }
             >
               We also specialize in revitalizing hard surfaces with our
-              top-notch pressure washing services. Whether it's driveways,
+              top-notch pressure washing services. Whether it`s driveways,
               sidewalks, patios, or commercial exteriors, our expert team uses
               advanced techniques and equipment to remove dirt, grime, and
               stains, restoring the original beauty of your surfaces. Serving

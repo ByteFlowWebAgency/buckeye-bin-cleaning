@@ -1,12 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 import { 
   signInWithEmailAndPassword, 
   signOut as firebaseSignOut,
   onAuthStateChanged 
-} from 'firebase/auth';
-import { auth } from '@/data/firebase';
+} from "firebase/auth";
+
+import { auth } from "@/data/firebase";
 
 // Create a default context with empty functions
 const AuthContext = createContext({
@@ -51,8 +52,8 @@ export const AuthProvider = ({ children }) => {
   console.log("Auth context rendering, loading:", loading, "user:", user ? "exists" : "null");
   
   return (
-    <AuthContext.Provider value={value}>
-      {children}
+    <AuthContext.Provider value={ value }>
+      { children }
     </AuthContext.Provider>
   );
 };

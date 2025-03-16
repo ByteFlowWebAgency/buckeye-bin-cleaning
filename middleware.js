@@ -6,8 +6,6 @@ export function middleware(request) {
     request.nextUrl.pathname.startsWith('/admin') && 
     !request.nextUrl.pathname.includes('/admin/login')
   ) {
-    // This approach will let client-side auth handle the actual protection
-    // It acts as a fallback for users without JS or initial loads
     return NextResponse.redirect(new URL('/admin/login', request.url));
   }
   

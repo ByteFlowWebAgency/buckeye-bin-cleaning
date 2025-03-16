@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db } from "@/data/firebase";
 import { collection, query, orderBy, getDocs, doc, updateDoc } from "firebase/firestore";
-import { useAuth } from '@/contexts/AuthContext';
+
+import { db } from "@/data/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
@@ -61,12 +62,11 @@ export default function AdminDashboard() {
       setOrders(orders.map(order => 
         order.id === orderId 
           ? { ...order, status: newStatus, ...updateData } 
-          : order
-      ));
+          : order));
       
       // Close detail view if open
       if (selectedOrder && selectedOrder.id === orderId) {
-        setSelectedOrder({...selectedOrder, status: newStatus, ...updateData});
+        setSelectedOrder({ ...selectedOrder, status: newStatus, ...updateData });
       }
       
     } catch (error) {
@@ -95,10 +95,10 @@ export default function AdminDashboard() {
 
   const exportOrdersToCSV = () => {
     // Format the data for CSV
-    const headers = ['Date', 'Customer', 'Email', 'Phone', 'Service', 'Address', 'Amount', 'Status'];
+    const headers = ["Date", "Customer", "Email", "Phone", "Service", "Address", "Amount", "Status"];
     
     const csvData = filteredOrders.map(order => [
-      order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() : 'N/A',
+      order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() : "N/A",
       order.customerName,
       order.customerEmail,
       order.customerPhone,
@@ -109,17 +109,17 @@ export default function AdminDashboard() {
     ]);
 
     const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
-    ].join('\n');
+      headers.join(","),
+      ...csvData.map(row => row.map(cell => `"${ cell }"`).join(","))
+    ].join("\n");
     
     // Create download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `orders-${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `orders-${ new Date().toISOString().slice(0, 10) }.csv`);
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -140,8 +140,8 @@ export default function AdminDashboard() {
             <label htmlFor="status-filter" className="mr-2 text-gray-700">Filter:</label>
             <select 
               id="status-filter"
-              value={filter} 
-              onChange={(e) => setFilter(e.target.value)}
+              value={ filter } 
+              onChange={ (e) => setFilter(e.target.value) }
               className="p-2 border rounded shadow-sm focus:ring-red-500 focus:border-red-500"
             >
               <option value="all">All Orders</option>
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
           </div>
         </div>
         
-        {orders.length === 0 ? (
+        { orders.length === 0 ? (
           <div className="text-center p-8 text-gray-500">
             No orders found. New orders will appear here when customers make purchases.
           </div>
@@ -172,73 +172,73 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredOrders.map(order => (
-                  <tr key={order.id} className="hover:bg-gray-50">
+                { filteredOrders.map(order => (
+                  <tr key={ order.id } className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.createdAt && new Date(order.createdAt.seconds * 1000).toLocaleDateString()}
+                      { order.createdAt && new Date(order.createdAt.seconds * 1000).toLocaleDateString() }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{order.customerName}</div>
-                      <div className="text-sm text-gray-500">{order.customerEmail}</div>
+                      <div className="text-sm font-medium text-gray-900">{ order.customerName }</div>
+                      <div className="text-sm text-gray-500">{ order.customerEmail }</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.servicePlanDisplay || order.servicePlan}
+                      { order.servicePlanDisplay || order.servicePlan }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate">
-                      {order.address}
+                      { order.address }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      ${order.amount}
+                      ${ order.amount }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${order.status === 'active' ? 'bg-green-100 text-green-800' : 
-                          order.status === 'completed' ? 'bg-blue-100 text-blue-800' : 
-                          order.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'}`}>
-                        {order.status}
+                      <span className={ `px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${ order.status === "active" ? "bg-green-100 text-green-800" : 
+                    order.status === "completed" ? "bg-blue-100 text-blue-800" : 
+                      order.status === "scheduled" ? "bg-yellow-100 text-yellow-800" :
+                        "bg-red-100 text-red-800" }` }>
+                        { order.status }
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <button 
                         className="text-indigo-600 hover:text-indigo-900 mr-4"
-                        onClick={() => viewOrderDetails(order)}
+                        onClick={ () => viewOrderDetails(order) }
                       >
                         View
                       </button>
-                      {order.status === 'active' && (
+                      { order.status === "active" && (
                         <button 
                           className="text-yellow-600 hover:text-yellow-900"
-                          onClick={() => handleUpdateStatus(order.id, 'scheduled')}
+                          onClick={ () => handleUpdateStatus(order.id, "scheduled") }
                         >
                           Schedule
                         </button>
-                      )}
-                      {order.status === 'scheduled' && (
+                      ) }
+                      { order.status === "scheduled" && (
                         <button 
                           className="text-blue-600 hover:text-blue-900"
-                          onClick={() => handleUpdateStatus(order.id, 'completed')}
+                          onClick={ () => handleUpdateStatus(order.id, "completed") }
                         >
                           Complete
                         </button>
-                      )}
+                      ) }
                     </td>
                   </tr>
-                ))}
+                )) }
               </tbody>
             </table>
           </div>
-        )}
+        ) }
       </div>
       
-      {/* Order Detail Modal */}
-      {selectedOrder && (
+      { /* Order Detail Modal */ }
+      { selectedOrder && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-2xl w-full m-4">
             <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">Order Details</h3>
               <button 
-                onClick={closeOrderDetails}
+                onClick={ closeOrderDetails }
                 className="text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">Close</span>
@@ -252,75 +252,75 @@ export default function AdminDashboard() {
                 <h4 className="text-sm font-medium text-gray-500">Customer Information</h4>
                 <div className="mt-2 grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-900">Name: {selectedOrder.customerName}</p>
-                    <p className="text-sm text-gray-900">Email: {selectedOrder.customerEmail}</p>
-                    <p className="text-sm text-gray-900">Phone: {selectedOrder.customerPhone}</p>
+                    <p className="text-sm text-gray-900">Name: { selectedOrder.customerName }</p>
+                    <p className="text-sm text-gray-900">Email: { selectedOrder.customerEmail }</p>
+                    <p className="text-sm text-gray-900">Phone: { selectedOrder.customerPhone }</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-900">Date: {selectedOrder.createdAt && new Date(selectedOrder.createdAt.seconds * 1000).toLocaleString()}</p>
-                    <p className="text-sm text-gray-900">Status: <span className="font-semibold">{selectedOrder.status}</span></p>
-                    <p className="text-sm text-gray-900">Amount: ${selectedOrder.amount}</p>
+                    <p className="text-sm text-gray-900">Date: { selectedOrder.createdAt && new Date(selectedOrder.createdAt.seconds * 1000).toLocaleString() }</p>
+                    <p className="text-sm text-gray-900">Status: <span className="font-semibold">{ selectedOrder.status }</span></p>
+                    <p className="text-sm text-gray-900">Amount: ${ selectedOrder.amount }</p>
                   </div>
                 </div>
               </div>
               <div className="mb-4">
                 <h4 className="text-sm font-medium text-gray-500">Service Details</h4>
                 <div className="mt-2">
-                  <p className="text-sm text-gray-900">Service: {selectedOrder.servicePlanDisplay || selectedOrder.servicePlan}</p>
-                  <p className="text-sm text-gray-900">Address: {selectedOrder.address}</p>
-                  <p className="text-sm text-gray-900">Pickup Day: {selectedOrder.dayOfPickupDisplay || selectedOrder.dayOfPickup}</p>
-                  <p className="text-sm text-gray-900">Pickup Time: {selectedOrder.timeOfPickupDisplay || selectedOrder.timeOfPickup}</p>
+                  <p className="text-sm text-gray-900">Service: { selectedOrder.servicePlanDisplay || selectedOrder.servicePlan }</p>
+                  <p className="text-sm text-gray-900">Address: { selectedOrder.address }</p>
+                  <p className="text-sm text-gray-900">Pickup Day: { selectedOrder.dayOfPickupDisplay || selectedOrder.dayOfPickup }</p>
+                  <p className="text-sm text-gray-900">Pickup Time: { selectedOrder.timeOfPickupDisplay || selectedOrder.timeOfPickup }</p>
                 </div>
               </div>
-              {selectedOrder.message && (
+              { selectedOrder.message && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-500">Special Instructions</h4>
-                  <p className="mt-2 text-sm text-gray-900">{selectedOrder.message}</p>
+                  <p className="mt-2 text-sm text-gray-900">{ selectedOrder.message }</p>
                 </div>
-              )}
-              {selectedOrder.status === 'cancelled' && selectedOrder.refundId && (
+              ) }
+              { selectedOrder.status === "cancelled" && selectedOrder.refundId && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-500">Refund Information</h4>
-                  <p className="mt-2 text-sm text-gray-900">Refund ID: {selectedOrder.refundId}</p>
-                  <p className="text-sm text-gray-900">Cancelled: {selectedOrder.cancelledAt && new Date(selectedOrder.cancelledAt.seconds * 1000).toLocaleString()}</p>
+                  <p className="mt-2 text-sm text-gray-900">Refund ID: { selectedOrder.refundId }</p>
+                  <p className="text-sm text-gray-900">Cancelled: { selectedOrder.cancelledAt && new Date(selectedOrder.cancelledAt.seconds * 1000).toLocaleString() }</p>
                 </div>
-              )}
+              ) }
             </div>
             <div className="bg-gray-50 px-6 py-4 flex justify-between">
-              {selectedOrder.status === 'active' && (
+              { selectedOrder.status === "active" && (
                 <button 
                   className="px-4 py-2 text-sm font-medium text-yellow-600 bg-yellow-100 rounded-md hover:bg-yellow-200"
-                  onClick={() => handleUpdateStatus(selectedOrder.id, 'scheduled')}
+                  onClick={ () => handleUpdateStatus(selectedOrder.id, "scheduled") }
                 >
                   Mark as Scheduled
                 </button>
-              )}
-              {selectedOrder.status === 'scheduled' && (
+              ) }
+              { selectedOrder.status === "scheduled" && (
                 <button 
                   className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200"
-                  onClick={() => handleUpdateStatus(selectedOrder.id, 'completed')}
+                  onClick={ () => handleUpdateStatus(selectedOrder.id, "completed") }
                 >
                   Mark as Completed
                 </button>
-              )}
+              ) }
               <button 
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
-                onClick={closeOrderDetails}
+                onClick={ closeOrderDetails }
               >
                 Close
               </button>
             </div>
             <div className="ml-2 py-2">
-                <button 
-                    onClick={exportOrdersToCSV}
-                    className="ml-4 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
-                    >
+              <button 
+                onClick={ exportOrdersToCSV }
+                className="ml-4 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
+              >
                     Export to Spreadsheet
-                </button>
+              </button>
             </div>
           </div>
         </div>
-      )}
+      ) }
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -33,11 +33,11 @@ const DAYS_OF_WEEK = {
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams.get("session_id");
 
   if (!sessionId) {
     return NextResponse.json(
-      { success: false, message: 'Session ID is required' },
+      { success: false, message: "Session ID is required" },
       { status: 400 }
     );
   }
@@ -45,12 +45,12 @@ export async function GET(request) {
   try {
     // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items', 'payment_intent']
+      expand: ["line_items", "payment_intent"]
     });
 
     if (!session) {
       return NextResponse.json(
-        { success: false, message: 'Session not found' },
+        { success: false, message: "Session not found" },
         { status: 404 }
       );
     }
@@ -86,7 +86,7 @@ export async function GET(request) {
           }
         }
       } catch (error) {
-        console.error('Error fetching line items:', error);
+        console.error("Error fetching line items:", error);
       }
     }
     
@@ -103,7 +103,7 @@ export async function GET(request) {
       } else if (amount === 100) {
         servicePlanDisplay = "Buckeye Summer Package ($100)";
       } else {
-        servicePlanDisplay = `Custom Service ($${amount.toFixed(2)})`;
+        servicePlanDisplay = `Custom Service ($${ amount.toFixed(2) })`;
       }
       console.log("Service plan determined from amount");
     }
@@ -128,9 +128,9 @@ export async function GET(request) {
       orderDetails
     });
   } catch (error) {
-    console.error('Error retrieving order details:', error);
+    console.error("Error retrieving order details:", error);
     return NextResponse.json(
-      { success: false, message: 'Error retrieving order details' },
+      { success: false, message: "Error retrieving order details" },
       { status: 500 }
     );
   }
