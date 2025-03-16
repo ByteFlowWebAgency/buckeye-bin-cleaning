@@ -33,9 +33,12 @@ describe("POST /api/order-details", () => {
       }),
     };
 
-    adminDb.collection("orders").where().get.mockResolvedValueOnce({
-      docs: [mockOrder],
-    });
+    adminDb
+      .collection("orders")
+      .where()
+      .get.mockResolvedValueOnce({
+        docs: [mockOrder],
+      });
 
     const request = {
       json: vi.fn(() => ({ orderId: "order123" })),
@@ -60,7 +63,11 @@ describe("POST /api/order-details", () => {
 
     // Verify Firestore was called
     expect(adminDb.collection).toHaveBeenCalledWith("orders");
-    expect(adminDb.collection("orders").where).toHaveBeenCalledWith("stripeSessionId", "==", "order123");
+    expect(adminDb.collection("orders").where).toHaveBeenCalledWith(
+      "stripeSessionId",
+      "==",
+      "order123",
+    );
   });
 
   it("should handle order not found", async () => {
@@ -83,7 +90,10 @@ describe("POST /api/order-details", () => {
   });
 
   it("should handle Firestore error", async () => {
-    adminDb.collection("orders").where().get.mockRejectedValueOnce(new Error("Firestore error"));
+    adminDb
+      .collection("orders")
+      .where()
+      .get.mockRejectedValueOnce(new Error("Firestore error"));
 
     const request = {
       json: vi.fn(() => ({ orderId: "order123" })),

@@ -46,7 +46,9 @@ describe("POST /api/validate-location", () => {
 
     // Verify fetch was called with the correct URL
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining("https://maps.googleapis.com/maps/api/geocode/json")
+      expect.stringContaining(
+        "https://maps.googleapis.com/maps/api/geocode/json",
+      ),
     );
   });
 

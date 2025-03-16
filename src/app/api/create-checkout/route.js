@@ -7,12 +7,12 @@ const PRICE_IDS = {
   monthly: "price_1QyejmQAAGErMriwUFBAzEE0",
   quarterly: "price_1QyepkQAAGErMriwysZvBPkf",
   oneTime: "price_1QyeyIQAAGErMriw3nc43sbo",
-  buckeyeSummerPackage: "price_1Qyf73QAAGErMriwVB4LSNuG"
+  buckeyeSummerPackage: "price_1Qyf73QAAGErMriwVB4LSNuG",
 };
 
 export async function POST(request) {
   try {
-    const { 
+    const {
       servicePlan,
       name,
       email,
@@ -20,14 +20,14 @@ export async function POST(request) {
       address,
       dayOfPickup,
       timeOfPickup,
-      message
+      message,
     } = await request.json();
 
     // Validate the service plan exists
     if (!PRICE_IDS[servicePlan]) {
       return NextResponse.json(
         { success: false, message: "Invalid service plan" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -41,8 +41,8 @@ export async function POST(request) {
         },
       ],
       mode: "payment",
-      success_url: `${ process.env.DOMAIN_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${ process.env.DOMAIN_URL }/cancel`,
+      success_url: `${process.env.DOMAIN_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.DOMAIN_URL}/cancel`,
       customer_email: email,
       metadata: {
         name,
@@ -50,8 +50,8 @@ export async function POST(request) {
         address,
         dayOfPickup,
         timeOfPickup,
-        message: message || "No message provided"
-      }
+        message: message || "No message provided",
+      },
     });
 
     return NextResponse.json({ success: true, url: session.url });
@@ -59,7 +59,7 @@ export async function POST(request) {
     console.error("Stripe checkout error: ", error);
     return NextResponse.json(
       { success: false, message: "Error creating checkout session" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

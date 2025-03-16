@@ -11,7 +11,9 @@ const firebaseAdminConfig = {
 };
 
 // Initialize Firebase Admin
-const app = !getApps().length ? initializeApp(firebaseAdminConfig) : getApps()[0];
+const app = !getApps().length
+  ? initializeApp(firebaseAdminConfig)
+  : getApps()[0];
 const adminDb = getFirestore(app);
 const adminAuth = getAuth(app);
 

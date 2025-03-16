@@ -10,17 +10,17 @@ async function setAdmin(email) {
   }
 
   try {
-    const response = await fetch(`${ process.env.DOMAIN_URL }/api/set-admin`, {
+    const response = await fetch(`${process.env.DOMAIN_URL}/api/set-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-        email, 
-        secretKey: process.env.ADMIN_SECRET_KEY 
+      body: JSON.stringify({
+        email,
+        secretKey: process.env.ADMIN_SECRET_KEY,
       }),
     });
-    
+
     const data = await response.json();
     console.log("Response:", data);
   } catch (error) {
@@ -30,8 +30,8 @@ async function setAdmin(email) {
 
 setAdmin("byteflowservices@gmail.com")
   .then(() => console.log("Done!"))
-  .catch(err => console.error("Script error:", err));
+  .catch((err) => console.error("Script error:", err));
 
 setAdmin("buckeyebincleaning@gmail.com")
   .then(() => console.log("Done!"))
-  .catch(err => console.error("Script error:", err));
+  .catch((err) => console.error("Script error:", err));

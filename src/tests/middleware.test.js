@@ -27,8 +27,13 @@ describe("middleware", () => {
     const response = middleware(request);
 
     // Check if NextResponse.redirect was called with the correct URL
-    expect(NextResponse.redirect).toHaveBeenCalledWith(new URL("/admin/login", request.url));
-    expect(response).toEqual({ redirected: true, url: "http://localhost:3000/admin/login" });
+    expect(NextResponse.redirect).toHaveBeenCalledWith(
+      new URL("/admin/login", request.url),
+    );
+    expect(response).toEqual({
+      redirected: true,
+      url: "http://localhost:3000/admin/login",
+    });
   });
 
   it("allows access to the /admin/login page", () => {

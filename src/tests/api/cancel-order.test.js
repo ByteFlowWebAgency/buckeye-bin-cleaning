@@ -59,7 +59,9 @@ describe("POST /api/cancel-order", () => {
       customer_email: "john.doe@example.com",
       amount_total: 3000, // $30.00
     };
-    Stripe.prototype.checkout.sessions.retrieve.mockResolvedValueOnce(mockSession);
+    Stripe.prototype.checkout.sessions.retrieve.mockResolvedValueOnce(
+      mockSession,
+    );
 
     // Mock Stripe refund creation
     const mockRefund = { id: "re_123" };
@@ -71,9 +73,12 @@ describe("POST /api/cancel-order", () => {
         update: vi.fn(() => Promise.resolve()),
       },
     };
-    adminDb.collection("orders").where().get.mockResolvedValueOnce({
-      docs: [mockOrderDoc],
-    });
+    adminDb
+      .collection("orders")
+      .where()
+      .get.mockResolvedValueOnce({
+        docs: [mockOrderDoc],
+      });
 
     // Mock request
     const request = {
@@ -88,16 +93,23 @@ describe("POST /api/cancel-order", () => {
       refundId: "re_123",
     });
 
-    expect(Stripe.prototype.checkout.sessions.retrieve).toHaveBeenCalledWith("cs_test_123", {
-      expand: ["payment_intent", "line_items"],
-    });
+    expect(Stripe.prototype.checkout.sessions.retrieve).toHaveBeenCalledWith(
+      "cs_test_123",
+      {
+        expand: ["payment_intent", "line_items"],
+      },
+    );
     expect(Stripe.prototype.refunds.create).toHaveBeenCalledWith({
       payment_intent: "pi_123",
       reason: "requested_by_customer",
     });
 
     expect(adminDb.collection).toHaveBeenCalledWith("orders");
-    expect(adminDb.collection("orders").where).toHaveBeenCalledWith("stripeSessionId", "==", "cs_test_123");
+    expect(adminDb.collection("orders").where).toHaveBeenCalledWith(
+      "stripeSessionId",
+      "==",
+      "cs_test_123",
+    );
     expect(mockOrderDoc.ref.update).toHaveBeenCalledWith({
       status: "cancelled",
       refundId: "re_123",
@@ -142,7 +154,9 @@ describe("POST /api/cancel-order", () => {
   });
 
   it("should handle Stripe API error", async () => {
-    Stripe.prototype.checkout.sessions.retrieve.mockRejectedValueOnce(new Error("Stripe API error"));
+    Stripe.prototype.checkout.sessions.retrieve.mockRejectedValueOnce(
+      new Error("Stripe API error"),
+    );
 
     const request = {
       json: vi.fn(() => ({ sessionId: "cs_test_123" })),
@@ -174,12 +188,17 @@ describe("POST /api/cancel-order", () => {
       customer_email: "john.doe@example.com",
       amount_total: 3000, // $30.00
     };
-    Stripe.prototype.checkout.sessions.retrieve.mockResolvedValueOnce(mockSession);
+    Stripe.prototype.checkout.sessions.retrieve.mockResolvedValueOnce(
+      mockSession,
+    );
 
     const mockRefund = { id: "re_123" };
     Stripe.prototype.refunds.create.mockResolvedValueOnce(mockRefund);
 
-    adminDb.collection("orders").where().get.mockRejectedValueOnce(new Error("Firestore error"));
+    adminDb
+      .collection("orders")
+      .where()
+      .get.mockRejectedValueOnce(new Error("Firestore error"));
 
     const request = {
       json: vi.fn(() => ({ sessionId: "cs_test_123" })),

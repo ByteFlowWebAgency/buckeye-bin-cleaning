@@ -21,7 +21,9 @@ describe("POST /api/create-checkout", () => {
 
   it("should create a checkout session successfully", async () => {
     const mockSession = { url: "https://checkout.stripe.com/session_123" };
-    Stripe.prototype.checkout.sessions.create.mockResolvedValueOnce(mockSession);
+    Stripe.prototype.checkout.sessions.create.mockResolvedValueOnce(
+      mockSession,
+    );
 
     // Mock request
     const request = {
@@ -56,8 +58,8 @@ describe("POST /api/create-checkout", () => {
         },
       ],
       mode: "payment",
-      success_url: `${ process.env.DOMAIN_URL }/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${ process.env.DOMAIN_URL }/cancel`,
+      success_url: `${process.env.DOMAIN_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.DOMAIN_URL}/cancel`,
       customer_email: "john.doe@example.com",
       metadata: {
         name: "John Doe",
@@ -95,7 +97,9 @@ describe("POST /api/create-checkout", () => {
   });
 
   it("should handle Stripe API error", async () => {
-    Stripe.prototype.checkout.sessions.create.mockRejectedValueOnce(new Error("Stripe API error"));
+    Stripe.prototype.checkout.sessions.create.mockRejectedValueOnce(
+      new Error("Stripe API error"),
+    );
 
     // Mock request
     const request = {

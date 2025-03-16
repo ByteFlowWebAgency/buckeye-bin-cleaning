@@ -34,7 +34,7 @@ describe("email.js", () => {
 
     // Check if sendMail was called with the correct email data
     expect(nodemailer.createTransport().sendMail).toHaveBeenCalledWith({
-      from: `"Buckeye Bin Cleaning" <${ process.env.EMAIL_USER }>`,
+      from: `"Buckeye Bin Cleaning" <${process.env.EMAIL_USER}>`,
       to: "test@example.com",
       subject: "Test Subject",
       html: "<p>Test HTML Content</p>",
@@ -46,7 +46,9 @@ describe("email.js", () => {
 
   it("handles email sending errors", async () => {
     // Mock sendMail to throw an error
-    nodemailer.createTransport().sendMail.mockRejectedValueOnce(new Error("Email sending failed"));
+    nodemailer
+      .createTransport()
+      .sendMail.mockRejectedValueOnce(new Error("Email sending failed"));
 
     const emailData = {
       to: "test@example.com",
