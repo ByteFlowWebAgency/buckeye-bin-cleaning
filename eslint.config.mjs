@@ -35,23 +35,7 @@ export default [
 
       semi: ['error', 'always'],
 
-      'no-unused-vars': 'warn',
-
       'object-curly-spacing': ['error', 'always'],
-
-      'react/jsx-curly-spacing': ['error', { when: 'always', children: true }],
-
-      'react/jsx-pascal-case': 'error',
-
-      'import/order': [
-        'error',
-        {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
-          'newlines-between': 'always',
-        },
-      ],
-
-      'prefer-arrow-callback': 'error',
 
       'arrow-spacing': ['error', { before: true, after: true }],
 
@@ -62,10 +46,6 @@ export default [
       'space-infix-ops': 'error',
 
       'block-spacing': 'error',
-
-      'function-paren-newline': ['error', 'consistent'],
-
-      'template-curly-spacing': ['error', 'always'],
     },
     settings: {
       react: {
