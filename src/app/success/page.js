@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Swal from "sweetalert2";
@@ -8,7 +8,8 @@ import Swal from "sweetalert2";
 import Button from "@/components/ui/Button";
 import Footer from "@/components/nav/Footer";
 
-export default function SuccessPage() {
+// Create a separate component for the success content
+function SuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const [orderDetails, setOrderDetails] = useState(null);
@@ -220,5 +221,26 @@ export default function SuccessPage() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto mb-4"></div>
+        <h2 className="text-xl font-semibold">Loading...</h2>
+      </div>
+    </div>
+  );
+}
+
+// Main page component
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SuccessContent />
+    </Suspense>
   );
 }
