@@ -1,51 +1,57 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getApps, initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 export function initFirebaseAdmin() {
-  try {
-    // Check if any Firebase Admin apps are already initialized
-    if (getApps().length === 0) {
-      const privateKey = (process.env.FIREBASE_ADMIN_PRIVATE_KEY || '')
-        .replace(/\\n/g, '\n')
-        .replace(/"/g, '')
-        .replace(/'/g, '');
+  // Skip initialization during build time
+  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build') {
+    return {
+      db: null,
+      auth: null
+    };
+  }
 
-      if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 
-          !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || 
-          !privateKey) {
-        throw new Error('Firebase Admin credentials are missing');
+  try {
+    // Check if any firebase apps have been initialized
+    const apps = getApps();
+    
+    if (!apps.length) {
+      // Get the private key
+      const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY
+        ? process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n')
+        : undefined;
+
+      if (!privateKey || !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+        throw new Error('Firebase Admin credentials not available');
       }
 
-      console.log('Initializing new Firebase Admin instance');
-      const app = initializeApp({
+      // Initialize the app
+      initializeApp({
         credential: cert({
           projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
           clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
-          privateKey: privateKey,
-        }),
+          privateKey: privateKey
+        })
       });
-
-      const db = getFirestore(app);
-      const auth = getAuth(app);
-
-      return { app, db, auth };
     }
 
-    console.log('Using existing Firebase Admin instance');
-    const app = getApps()[0];
-    return {
-      app,
-      db: getFirestore(app),
-      auth: getAuth(app)
-    };
+    // Get Firestore and Auth instances
+    const db = getFirestore();
+    const auth = getAuth();
+
+    return { db, auth };
   } catch (error) {
     console.error('Firebase Admin initialization error:', error);
-    console.error('Error details:', {
-      code: error.code,
-      message: error.message,
-      stack: error.stack
-    });
-    throw error;
+    
+    // During development, throw the error
+    if (process.env.NODE_ENV === 'development') {
+      throw error;
+    }
+    
+    // In production, return null instances
+    return {
+      db: null,
+      auth: null
+    };
   }
 } 

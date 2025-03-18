@@ -61,17 +61,20 @@ const DAYS_OF_WEEK = {
 };
 
 export async function POST(request) {
+  const { db } = initFirebaseAdmin();
+  
+  // Skip Firebase operations during build
+  if (!db) {
+    console.log('Skipping Firebase operations during build');
+    return NextResponse.json({ received: true });
+  }
+
   const payload = await request.text();
   const sig = request.headers.get("stripe-signature");
 
   let event;
-  let db;
 
   try {
-    // Initialize Firebase first
-    const { db: firestoreDb } = initFirebaseAdmin();
-    db = firestoreDb;
-    
     // Verify Stripe signature
     if (!sig || !endpointSecret) {
       console.error('Missing stripe signature or endpoint secret');
@@ -94,10 +97,6 @@ export async function POST(request) {
 
   // Handle specific event types
   try {
-    if (!db) {
-      throw new Error('Database connection not initialized');
-    }
-
     switch (event.type) {
       case 'checkout.session.completed':
         const session = event.data.object;

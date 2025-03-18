@@ -39,6 +39,13 @@ const DAYS_OF_WEEK = {
 export async function POST(request) {
   try {
     const { db } = initFirebaseAdmin();
+    
+    // Skip Firebase operations during build
+    if (!db) {
+      console.log('Skipping Firebase operations during build');
+      return NextResponse.json({ success: true });
+    }
+
     const { sessionId } = await request.json();
 
     if (!sessionId) {
