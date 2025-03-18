@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
-
 import { useAuth } from "@/contexts/AuthContext";
 
 // Loading fallback component
@@ -20,11 +19,20 @@ function AdminLoginContent() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Only redirect if user is logged in and auth is not loading
+  // Skip auth context during build
+  const auth = useAuth();
+  const { signIn, user, loading: authLoading } = auth || { 
+    signIn: null, 
+    user: null, 
+    loading: true 
+  };
+
+  // Only run effect on client side
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (user && !authLoading) {
       router.push("/admin");
     }
@@ -32,6 +40,8 @@ function AdminLoginContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!signIn) return; // Guard against build-time calls
+    
     setError("");
     setLoading(true);
 
@@ -45,7 +55,8 @@ function AdminLoginContent() {
     }
   };
 
-  if (authLoading) {
+  // Show loading state during build or initial auth loading
+  if (typeof window === 'undefined' || authLoading) {
     return <LoadingFallback />;
   }
 
@@ -60,10 +71,12 @@ function AdminLoginContent() {
             Sign in to access the admin dashboard
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={ handleSubmit }>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+              <label htmlFor="email-address" className="sr-only">
+                Email address
+              </label>
               <input
                 id="email-address"
                 name="email"
@@ -72,12 +85,14 @@ function AdminLoginContent() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
-                value={ email }
-                onChange={ (e) => setEmail(e.target.value) }
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">Password</label>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
               <input
                 id="password"
                 name="password"
@@ -86,23 +101,25 @@ function AdminLoginContent() {
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
-                value={ password }
-                onChange={ (e) => setPassword(e.target.value) }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
 
-          { error && (
-            <div className="text-red-500 text-sm text-center">{ error }</div>
-          ) }
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
 
           <div>
             <button
               type="submit"
-              disabled={ loading }
-              className={ `group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${ loading ? "opacity-70 cursor-not-allowed" : "" }` }
+              disabled={loading || !signIn}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              { loading ? "Signing in..." : "Sign in" }
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>
@@ -113,6 +130,11 @@ function AdminLoginContent() {
 
 // Main page component
 export default function AdminLogin() {
+  // Skip rendering during build
+  if (typeof window === 'undefined') {
+    return <LoadingFallback />;
+  }
+
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AdminLoginContent />
