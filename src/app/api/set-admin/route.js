@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-
-import { adminAuth } from "@/data/firebase-admin";
+import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 
 export async function POST(request) {
   try {
+    const { auth } = initFirebaseAdmin();
     const { email, secretKey } = await request.json();
 
     console.log("Received secret key:", secretKey);
@@ -18,10 +18,10 @@ export async function POST(request) {
     }
 
     // Find the user by email
-    const user = await adminAuth.getUserByEmail(email);
+    const user = await auth.getUserByEmail(email);
 
     // Set custom admin claim
-    await adminAuth.setCustomUserClaims(user.uid, { admin: true });
+    await auth.setCustomUserClaims(user.uid, { admin: true });
 
     return NextResponse.json({
       success: true,

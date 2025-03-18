@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-
-import { adminAuth } from "@/data/firebase-admin";
+import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY;
 
 export async function POST(request) {
   try {
+    const { auth } = initFirebaseAdmin();
     const { email, password, secretKey } = await request.json();
 
     if (secretKey !== ADMIN_SECRET) {
@@ -15,13 +15,13 @@ export async function POST(request) {
       );
     }
 
-    const userRecord = await adminAuth.createUser({
+    const userRecord = await auth.createUser({
       email,
       password,
       emailVerified: true,
     });
 
-    await adminAuth.setCustomUserClaims(userRecord.uid, { admin: true });
+    await auth.setCustomUserClaims(userRecord.uid, { admin: true });
 
     return NextResponse.json({
       success: true,

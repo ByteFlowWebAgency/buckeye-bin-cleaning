@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 
-import { adminDb } from "@/data/firebase-admin";
+import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -38,6 +38,7 @@ const DAYS_OF_WEEK = {
 
 export async function POST(request) {
   try {
+    const { db } = initFirebaseAdmin();
     const { sessionId } = await request.json();
 
     if (!sessionId) {
@@ -142,7 +143,7 @@ export async function POST(request) {
     }
 
     try {
-      const ordersRef = adminDb.collection("orders");
+      const ordersRef = db.collection("orders");
       const q = ordersRef.where("stripeSessionId", "==", sessionId);
       const querySnapshot = await q.get();
 

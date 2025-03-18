@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
+import { getFirestore } from 'firebase-admin/firestore';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -12,6 +14,8 @@ const PRICE_IDS = {
 
 export async function POST(request) {
   try {
+    const { db } = initFirebaseAdmin();
+
     const {
       servicePlan,
       name,
