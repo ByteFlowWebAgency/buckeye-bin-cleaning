@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
+import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { getFirestore } from 'firebase-admin/firestore';
 
 const PRICE_IDS = {

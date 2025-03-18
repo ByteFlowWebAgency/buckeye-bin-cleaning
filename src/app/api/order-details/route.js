@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { initFirebaseAdmin } from "@/lib/firebaseAdmin";
+import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 const SERVICE_PLANS = {
   monthly: "Monthly Service ($30)",

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
+import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY;
 

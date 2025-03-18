@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 
-import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
+import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
