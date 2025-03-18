@@ -2,15 +2,20 @@ import { NextResponse } from "next/server";
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 export async function POST(request) {
-  try {
-    const { auth } = initFirebaseAdmin();
-    
-    // Skip Firebase operations during build
-    if (!auth) {
-      console.log('Skipping Firebase operations during build');
-      return NextResponse.json({ success: true });
-    }
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
+    return NextResponse.json({ success: true });
+  }
 
+  const { auth } = initFirebaseAdmin();
+  
+  if (!auth) {
+    console.log('Firebase Auth not available');
+    return NextResponse.json({ success: true });
+  }
+
+  try {
     const { email, secretKey } = await request.json();
 
     console.log("Received secret key:", secretKey);

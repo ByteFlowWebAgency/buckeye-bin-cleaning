@@ -58,18 +58,22 @@ const DAYS_OF_WEEK = {
 };
 
 export async function POST(request) {
-  // Move initialization inside the function
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  // Initialize Firebase Admin
-  const { db } = initFirebaseAdmin();
-  
-  // Skip Firebase operations during build
-  if (!db) {
-    console.log('Skipping Firebase operations during build');
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
     return NextResponse.json({ received: true });
   }
+
+  // Initialize services
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const { db } = initFirebaseAdmin();
+  
+  if (!db) {
+    console.log('Firebase DB not available');
+    return NextResponse.json({ received: true });
+  }
+
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   const payload = await request.text();
   const sig = request.headers.get("stripe-signature");

@@ -11,18 +11,21 @@ const PRICE_IDS = {
 };
 
 export async function POST(request) {
-  // Move initialization inside the function
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  
-  try {
-    const { db } = initFirebaseAdmin();
-    
-    // Skip Firebase operations during build
-    if (!db) {
-      console.log('Skipping Firebase operations during build');
-      return NextResponse.json({ success: true });
-    }
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
+    return NextResponse.json({ success: true });
+  }
 
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const { db } = initFirebaseAdmin();
+  
+  if (!db) {
+    console.log('Firebase DB not available');
+    return NextResponse.json({ success: true });
+  }
+
+  try {
     const {
       servicePlan,
       name,

@@ -1,20 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
-
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// reusable transporter object using Gmail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
-});
-
+// Constants can stay outside
 const SERVICE_PLANS = {
   monthly: "Monthly Service ($30)",
   quarterly: "Quarterly Service ($45)",
@@ -37,6 +26,22 @@ const DAYS_OF_WEEK = {
 };
 
 export async function POST(request) {
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
+    return NextResponse.json({ success: true });
+  }
+
+  // Initialize services inside the route handler
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_APP_PASSWORD,
+    },
+  });
+
   try {
     const { db } = initFirebaseAdmin();
     

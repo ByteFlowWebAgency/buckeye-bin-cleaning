@@ -31,9 +31,20 @@ const DAYS_OF_WEEK = {
 };
 
 export async function GET(request) {
-  // Move initialization inside the function
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
+    return NextResponse.json({ success: true });
+  }
+
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const { db } = initFirebaseAdmin();
   
+  if (!db) {
+    console.log('Firebase DB not available');
+    return NextResponse.json({ success: true });
+  }
+
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("session_id");
 
@@ -45,13 +56,6 @@ export async function GET(request) {
   }
 
   try {
-    // Skip Firebase operations during build
-    const { db } = initFirebaseAdmin();
-    if (!db) {
-      console.log('Skipping Firebase operations during build');
-      return NextResponse.json({ success: true });
-    }
-
     // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ["line_items", "payment_intent"],
