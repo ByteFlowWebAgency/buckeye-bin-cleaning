@@ -6,8 +6,8 @@ import { Suspense } from 'react';
 
 import { useAuth, AuthProvider } from "@/contexts/AuthContext";
 
-// Admin layout component without the AuthProvider
-function AdminLayout({ children }) {
+// Renamed to AdminLayoutContent
+function AdminLayoutContent({ children }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -80,7 +80,7 @@ function LoadingFallback() {
   );
 }
 
-// Wrap the layout with the AuthProvider
+// Main layout component
 export default function AdminLayout({ children }) {
   if (typeof window === 'undefined') {
     return <LoadingFallback />;
@@ -89,7 +89,7 @@ export default function AdminLayout({ children }) {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <AuthProvider>
-        <AdminLayout>{ children }</AdminLayout>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
       </AuthProvider>
     </Suspense>
   );
