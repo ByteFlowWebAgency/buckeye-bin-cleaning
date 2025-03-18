@@ -1,11 +1,23 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import Button from "@/components/ui/Button";
 
-export default function CancelPage() {
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto mb-4"></div>
+      <h2 className="text-xl font-semibold">Loading...</h2>
+    </div>
+  );
+}
+
+// Main content component
+function CancelContent() {
   const searchParams = useSearchParams();
   const refunded = searchParams.get("refunded") === "true";
 
@@ -55,5 +67,14 @@ export default function CancelPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component
+export default function CancelPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <CancelContent />
+    </Suspense>
   );
 }

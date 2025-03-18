@@ -1,11 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function AdminLogin() {
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+    </div>
+  );
+}
+
+// Main login content component
+function AdminLoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -36,11 +46,7 @@ export default function AdminLogin() {
   };
 
   if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-      </div>
-    );
+    return <LoadingFallback />;
   }
 
   return (
@@ -102,5 +108,14 @@ export default function AdminLogin() {
         </form>
       </div>
     </div>
+  );
+}
+
+// Main page component
+export default function AdminLogin() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AdminLoginContent />
+    </Suspense>
   );
 }
