@@ -6,7 +6,6 @@ import { Suspense } from 'react';
 
 import { useAuth, AuthProvider } from "@/contexts/AuthContext";
 
-// Renamed to AdminLayoutContent
 function AdminLayoutContent({ children }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
