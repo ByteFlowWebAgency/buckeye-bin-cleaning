@@ -6,6 +6,13 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY;
 export async function POST(request) {
   try {
     const { auth } = initFirebaseAdmin();
+    
+    // Skip Firebase operations during build
+    if (!auth) {
+      console.log('Skipping Firebase operations during build');
+      return NextResponse.json({ success: true });
+    }
+
     const { email, password, secretKey } = await request.json();
 
     if (secretKey !== ADMIN_SECRET) {

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+import { initFirebaseAdmin } from "@/lib/firebaseAdmin";
 
 const SERVICE_PLANS = {
   monthly: "Monthly Service ($30)",
@@ -32,6 +31,9 @@ const DAYS_OF_WEEK = {
 };
 
 export async function GET(request) {
+  // Move initialization inside the function
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("session_id");
 
@@ -43,6 +45,13 @@ export async function GET(request) {
   }
 
   try {
+    // Skip Firebase operations during build
+    const { db } = initFirebaseAdmin();
+    if (!db) {
+      console.log('Skipping Firebase operations during build');
+      return NextResponse.json({ success: true });
+    }
+
     // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ["line_items", "payment_intent"],

@@ -4,6 +4,13 @@ import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 export async function POST(request) {
   try {
     const { auth } = initFirebaseAdmin();
+    
+    // Skip Firebase operations during build
+    if (!auth) {
+      console.log('Skipping Firebase operations during build');
+      return NextResponse.json({ success: true });
+    }
+
     const { email, secretKey } = await request.json();
 
     console.log("Received secret key:", secretKey);

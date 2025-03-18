@@ -4,9 +4,6 @@ import nodemailer from "nodemailer";
 
 import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
 // Create reusable transporter object using Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -61,6 +58,11 @@ const DAYS_OF_WEEK = {
 };
 
 export async function POST(request) {
+  // Move initialization inside the function
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  // Initialize Firebase Admin
   const { db } = initFirebaseAdmin();
   
   // Skip Firebase operations during build

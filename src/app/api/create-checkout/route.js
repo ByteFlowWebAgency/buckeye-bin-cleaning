@@ -3,8 +3,6 @@ import Stripe from "stripe";
 import { initFirebaseAdmin } from '@/utils/firebase-admin-init';
 import { getFirestore } from 'firebase-admin/firestore';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const PRICE_IDS = {
   monthly: "price_1QyejmQAAGErMriwUFBAzEE0",
   quarterly: "price_1QyepkQAAGErMriwysZvBPkf",
@@ -13,8 +11,17 @@ const PRICE_IDS = {
 };
 
 export async function POST(request) {
+  // Move initialization inside the function
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  
   try {
     const { db } = initFirebaseAdmin();
+    
+    // Skip Firebase operations during build
+    if (!db) {
+      console.log('Skipping Firebase operations during build');
+      return NextResponse.json({ success: true });
+    }
 
     const {
       servicePlan,
