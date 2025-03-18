@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
-
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 // Create reusable transporter object using Gmail

@@ -1,38 +1,39 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '@/lib/firebase'; // your firebase config
+import { auth } from '@/data/firebase';
 
-const AuthContext = createContext();
+const AuthContext = createContext({
+  user: null,
+  loading: true,
+  signIn: async () => null,
+  signOut: async () => null
+});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Skip initialization during build
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !auth) return;
 
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    return auth.onAuthStateChanged(user => {
       setUser(user);
       setLoading(false);
     });
-
-    return unsubscribe;
   }, []);
-
-  // Return null or loading state during build
-  if (typeof window === 'undefined') {
-    return children;
-  }
 
   const value = {
     user,
     loading,
     signIn: async (email, password) => {
+      if (!auth) return null;
       return auth.signInWithEmailAndPassword(email, password);
     },
-    // ... other auth methods
+    signOut: async () => {
+      if (!auth) return null;
+      return auth.signOut();
+    }
   };
 
   return (
@@ -43,9 +44,5 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-  // Return null during build
-  if (typeof window === 'undefined') {
-    return null;
-  }
   return useContext(AuthContext);
 }

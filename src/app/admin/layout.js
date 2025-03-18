@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Suspense } from 'react';
 
 import { useAuth, AuthProvider } from "@/contexts/AuthContext";
 
@@ -71,11 +72,25 @@ function AdminLayout({ children }) {
   );
 }
 
-// Wrap the layout with the AuthProvider
-export default function AdminLayoutWithAuth({ children }) {
+function LoadingFallback() {
   return (
-    <AuthProvider>
-      <AdminLayout>{ children }</AdminLayout>
-    </AuthProvider>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+    </div>
+  );
+}
+
+// Wrap the layout with the AuthProvider
+export default function AdminLayout({ children }) {
+  if (typeof window === 'undefined') {
+    return <LoadingFallback />;
+  }
+
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AuthProvider>
+        <AdminLayout>{ children }</AdminLayout>
+      </AuthProvider>
+    </Suspense>
   );
 }

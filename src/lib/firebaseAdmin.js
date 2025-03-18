@@ -3,13 +3,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
 export function initFirebaseAdmin() {
-  // Skip initialization during build time
   if (process.env.NEXT_PHASE === 'phase-production-build') {
-    console.log('Skipping Firebase Admin initialization during build phase');
-    return {
-      db: null,
-      auth: null
-    };
+    return { db: null, auth: null };
   }
 
   try {
@@ -21,11 +16,7 @@ export function initFirebaseAdmin() {
         : undefined;
 
       if (!privateKey || !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-        console.log('Firebase Admin credentials not available');
-        return {
-          db: null,
-          auth: null
-        };
+        return { db: null, auth: null };
       }
 
       initializeApp({
@@ -37,15 +28,12 @@ export function initFirebaseAdmin() {
       });
     }
 
-    const db = getFirestore();
-    const auth = getAuth();
-
-    return { db, auth };
+    return {
+      db: getFirestore(),
+      auth: getAuth()
+    };
   } catch (error) {
     console.error('Firebase Admin initialization error:', error);
-    return {
-      db: null,
-      auth: null
-    };
+    return { db: null, auth: null };
   }
 } 
