@@ -43,44 +43,44 @@ const ProcessCard = ({ step }) => {
   return (
     <motion.div
       className="bg-white rounded-lg border w-full flex flex-col items-center"
-      variants={cardVariants}
+      variants={ cardVariants }
       whileHover="hover"
-      style={{
+      style={ {
         width: "200px",
         height: "400px",
         padding: "20px 20px",
-      }}
+      } }
     >
       <motion.div
         className="mb-3 relative w-16 h-16 flex items-center justify-center"
-        variants={iconVariants}
+        variants={ iconVariants }
         initial="hidden"
         animate="visible"
       >
         <Image
-          src={step.icon}
-          alt={step.title}
-          width={40}
-          height={40}
-          priority={step.id <= 3}
-          style={{ objectFit: "contain" }}
+          src={ step.icon }
+          alt={ step.title }
+          width={ 40 }
+          height={ 40 }
+          priority={ step.id <= 3 }
+          style={ { objectFit: "contain" } }
         />
       </motion.div>
       <motion.h3
         className="text-lg font-semibold mb-2 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.3 }}
+        initial={ { opacity: 0 } }
+        animate={ { opacity: 1 } }
+        transition={ { delay: 0.3, duration: 0.3 } }
       >
-        {step.title}
+        { step.title }
       </motion.h3>
       <motion.div
         className="overflow-auto flex-1 w-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.3 }}
+        initial={ { opacity: 0 } }
+        animate={ { opacity: 1 } }
+        transition={ { delay: 0.4, duration: 0.3 } }
       >
-        <p className="text-gray-600 text-xs text-center">{step.description}</p>
+        <p className="text-gray-600 text-xs text-center">{ step.description }</p>
       </motion.div>
     </motion.div>
   );

@@ -23,19 +23,19 @@ const Button = ({
   const baseStyles =
     "inline-flex items-center justify-center rounded-lg transition-colors font-medium focus:outline-none";
 
-  const classes = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `${ baseStyles } ${ variants[variant] } ${ sizes[size] } ${ className }`;
 
   if (href) {
     return (
-      <Link href={href} className={classes} {...props}>
-        {children}
+      <Link href={ href } className={ classes } { ...props }>
+        { children }
       </Link>
     );
   }
 
   return (
-    <button className={classes} {...props}>
-      {children}
+    <button className={ classes } { ...props }>
+      { children }
     </button>
   );
 };

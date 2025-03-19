@@ -1,35 +1,37 @@
 import React from "react";
-import Section from "./Section";
-import ServiceCard from "../ui/ServiceCards";
 import { motion } from "framer-motion";
+
+import ServiceCard from "../ui/ServiceCards";
+
+import Section from "./Section";
 
 const servicePlans = [
   {
     id: "monthly",
     serviceType: "Monthly",
     price: 30,
-    duration: "Every 3 months",
+    duration: "Every month for 3 months",
     numberOfcans: "Includes 2 cans",
   },
   {
     id: "quarterly",
-    serviceType: "Quarterly Plan",
+    serviceType: "Quarterly",
     price: 45,
     duration: "Every 3 months",
     numberOfcans: "Includes 2 cans",
   },
   {
     id: "oneTime",
-    serviceType: "One Time",
+    serviceType: "One time",
     price: 60,
-    duration: "One Time Service",
+    duration: "One Time service",
     numberOfcans: "Includes 2 cans",
   },
   {
     id: "buckeyeSummerPackage",
     serviceType: "Buckeye Summer Package",
     price: 100,
-    duration: "Includes May - August",
+    duration: "Includes May-August",
     numberOfcans: "Includes 2 cans",
   },
 ];
@@ -49,32 +51,33 @@ const Services = () => {
     <Section id="services" className="bg-[#37B6FF] pb-32 mb-40">
       <div className="container px-6 mx-auto">
         <motion.h1
-          className="text-white font-bold text-5xl py-12 sm:text-center md:text-center lg:text-left xl:text-left"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-white font-bold text-5xl py-12 text-center lg:text-left xl:text-left"
+          initial={ { opacity: 0, y: -20 } }
+          animate={ { opacity: 1, y: 0 } }
+          transition={ { duration: 0.6, ease: "easeOut" } }
         >
           Our Service Plans
         </motion.h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {servicePlans.map((plan, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          { servicePlans.map((plan, index) => (
             <motion.div
-              key={plan.id}
-              variants={cardVariants}
+              key={ plan.id }
+              variants={ cardVariants }
               initial="hidden"
               animate="visible"
               whileHover="hover"
-              custom={index}
+              custom={ index }
             >
               <ServiceCard
-                serviceType={plan.serviceType}
-                price={plan.price}
-                duration={plan.duration}
-                numberOfcans={plan.numberOfcans}
+                id={ plan.id }
+                serviceType={ plan.serviceType }
+                price={ plan.price }
+                duration={ plan.duration }
+                numberOfcans={ plan.numberOfcans }
               />
             </motion.div>
-          ))}
+          )) }
         </div>
       </div>
     </Section>

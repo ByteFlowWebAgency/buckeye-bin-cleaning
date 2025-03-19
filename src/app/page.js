@@ -1,11 +1,11 @@
 "use client";
 
-import Navbar from "../components/ui/Navbar";
-import Hero from "../components/layout/Hero";
+import Navbar from "../components/nav/Navbar";
+import Hero from "../components/layout/HeroSection";
 import WorkProcessSection from "../components/layout/WorkProcessSection";
-import Services from "../components/layout/Services";
+import Services from "../components/layout/ServicesSection";
 import AboutSection from "../components/layout/AboutSection";
-import Footer from "../components/layout/Footer";
+import Footer from "../components/nav/Footer";
 import ContactUsSection from "../components/layout/ContactUsSection";
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
       <WorkProcessSection id="work-process" />
       <Services id="services" />
       <AboutSection id="about-us" />
-      <ContactUsSection />
+      <ContactUsSection id="contact-us" />
       <Footer />
     </>
   );
