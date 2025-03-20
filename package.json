@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev && node src/scripts/set-admin.js",
-    "build": "DISABLE_ESLINT_PLUGIN=true next build && node src/scripts/set-admin.js",
+    "build": "DISABLE_ESLINT_PLUGIN=true next build",
     "build:ci": "NEXT_PHASE=phase-production-build next build",
     "build:with-admin": "DISABLE_ESLINT_PLUGIN=true next build && node src/scripts/set-admin.js",
     "postbuild": "echo 'Build completed successfully'",
