@@ -1,92 +1,72 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Button from '@/components/ui/Button';
 
-// Loading fallback component
-function LoadingFallback() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
-    </div>
-  );
-}
-
-// Main login content component
-function AdminLoginContent() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function AdminLogin() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { signIn } = useAuth();
   const router = useRouter();
-
-  // Skip auth context during build
-  const auth = useAuth();
-  const { signIn, user, loading: authLoading } = auth || { 
-    signIn: null, 
-    user: null, 
-    loading: true 
-  };
-
-  // Only run effect on client side
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    if (user && !authLoading) {
-      router.push("/admin");
-    }
-  }, [user, authLoading, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!signIn) return; // Guard against build-time calls
-    
-    setError("");
-    setLoading(true);
-
     try {
-      await signIn(email, password);
+      const user = await signIn(email, password);
+      if (user.admin) {
+        router.push('/admin');
+      } else {
+        setError('Not authorized as admin');
+      }
     } catch (error) {
-      console.error("Login error:", error);
-      setError("Failed to sign in. Check your credentials.");
-    } finally {
-      setLoading(false);
+      setError('Invalid email or password');
     }
   };
 
-  // Show loading state during build or initial auth loading
-  if (typeof window === 'undefined' || authLoading) {
-    return <LoadingFallback />;
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Admin Login
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md space-y-8 px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
+            Admin Portal
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sign in to access the admin dashboard
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 mt-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="space-y-4 rounded-md shadow-sm">
             <div>
-              <label htmlFor="email-address" className="sr-only">
+              <label htmlFor="email" className="sr-only">
                 Email address
               </label>
               <input
-                id="email-address"
-                name="email"
+                id="email"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+                className="relative block w-full rounded-lg border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                placeholder="Email address"
               />
             </div>
             <div>
@@ -95,49 +75,41 @@ function AdminLoginContent() {
               </label>
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-red-500 focus:border-red-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                className="relative block w-full rounded-lg border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-red-600 sm:text-sm sm:leading-6"
+                placeholder="Password"
               />
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
-
           <div>
-            <button
+            <Button
               type="submit"
-              disabled={loading || !signIn}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
-                loading ? "opacity-70 cursor-not-allowed" : ""
-              }`}
+              variant="primary"
+              size="lg"
+              className="w-full flex justify-center items-center gap-2"
             >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
+              Sign in
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                />
+              </svg>
+            </Button>
           </div>
         </form>
       </div>
     </div>
-  );
-}
-
-// Main page component
-export default function AdminLogin() {
-  // Skip rendering during build
-  if (typeof window === 'undefined') {
-    return <LoadingFallback />;
-  }
-
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <AdminLoginContent />
-    </Suspense>
   );
 }
