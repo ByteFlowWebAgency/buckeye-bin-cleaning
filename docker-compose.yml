@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  development:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+      - ./node_modules:/app/node_modules
+      - ./public:/app/public
+      - next-cache:/app/.next/cache
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_SHARP_PATH: /app/node_modules/sharp
+    command: npm run dev
+
+  production:
+    build:
+      context: .
+      target: production
+    volumes:
+      - ./app/public:/app/public
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_SHARP_PATH: /app/node_modules/sharp
+    command: npm run start
+
+volumes:
+  next-cache:
