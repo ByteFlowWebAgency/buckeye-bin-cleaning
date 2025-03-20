@@ -1,7 +1,14 @@
-const path = require("path");
+import path from "path";
+import { fileURLToPath } from "url";
+import fetch from "node-fetch";
+import dotenv from "dotenv";
 
-const fetch = require("node-fetch");
-require("dotenv").config({ path: path.resolve(__dirname, "../../.env.local") });
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables
+dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
 
 async function setAdmin(email) {
   if (!process.env.ADMIN_SECRET_KEY) {
