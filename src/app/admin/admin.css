@@ -1,0 +1,44 @@
+/* app/admin/admin.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.admin-header {
+  @apply bg-white shadow;
+}
+
+.admin-title {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.admin-button {
+  @apply px-4 py-2 rounded-md;
+}
+
+.admin-button-primary {
+  @apply bg-red-500 hover:bg-red-600 text-white;
+}
+
+.admin-button-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 text-gray-700;
+}
+
+.admin-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.admin-table thead {
+  @apply bg-gray-50;
+}
+
+.admin-table th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.admin-table tbody {
+  @apply bg-white divide-y divide-gray-200;
+}
+
+.admin-table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+}
