@@ -173,7 +173,20 @@ function SuccessContent() {
           <div className="px-6 sm:px-8 py-6 border-t border-gray-200 bg-gray-50">
             <h3 className="text-lg font-medium text-gray-900 mb-2">What's Next?</h3>
             <p className="text-gray-600 mb-4">
-              Our team will service your bins on your next trash pickup day. You'll receive a text message reminder the day before.
+              Thank you for choosing Buckeye Bin Cleaning! Our team will reach out within 1-3 business days to confirm your service details and schedule. If you have any immediate questions, feel free to contact us at{' '}
+              <a 
+                href="tel:440-230-6165" 
+                className="text-[#37B6FF] hover:underline"
+              >
+                440-230-6165
+              </a>
+              {' '}or{' '}
+              <a 
+                href="mailto:Buckeyebincleaning@gmail.com"
+                className="text-[#37B6FF] hover:underline"
+              >
+                Buckeyebincleaning@gmail.com
+              </a>
             </p>
             <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
               <Link href="/" passHref>

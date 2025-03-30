@@ -29,8 +29,8 @@ export async function sendCustomerConfirmationEmail(orderDetails) {
           <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
         </div>
         
-        <p>Our team will service your bins on your next trash pickup day.</p>
-        <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (555) 123-4567.</p>
+        <p>Say buckeye bin cleaning will reaching 1-3 days with scheduling details.</p>
+        <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (216) 230-6165.</p>
         
         <p>Thank you for choosing Buckeye Bin Cleaning!</p>
       </div>

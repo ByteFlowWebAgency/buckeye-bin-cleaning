@@ -4,13 +4,13 @@ import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { getFirestore } from 'firebase-admin/firestore';
 
 const PRICE_IDS = {
-  monthly: "price_1QyejmQAAGErMriwUFBAzEE0",
-  quarterly: "price_1QyepkQAAGErMriwysZvBPkf",
-  oneTime: "price_1QyeyIQAAGErMriw3nc43sbo",
-  buckeyeSummerPackage: "price_1Qyf73QAAGErMriwVB4LSNuG",
+  monthly: "price_1R8ELrGMbVFwRLXqhUtIBohJ",
+  quarterly: "price_1R8ES4GMbVFwRLXq0Kwc7QZO",
+  oneTime: "price_1R8EV4GMbVFwRLXqGIsSuhEB",
+  buckeyeSummerPackage: "price_1R8EZFGMbVFwRLXqAtRwjnuK",
 };
 
-export async function POST(request) {
+export async function POST(req) {
   // Skip during build phase
   if (process.env.NEXT_PHASE === 'phase-production-build') {
     console.log('Skipping route execution during build phase');
@@ -26,54 +26,69 @@ export async function POST(request) {
   }
 
   try {
-    const {
-      servicePlan,
-      name,
-      email,
-      phone,
-      address,
-      dayOfPickup,
-      timeOfPickup,
-      message,
-    } = await request.json();
+    const data = await req.json();
+    const { servicePlan } = data;
 
-    // Validate the service plan exists
-    if (!PRICE_IDS[servicePlan]) {
-      return NextResponse.json(
-        { success: false, message: "Invalid service plan" },
-        { status: 400 },
-      );
+    // Get the base URL from environment or construct it from the request
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+      `${req.headers.get('x-forwarded-proto') || 'https'}://${req.headers.get('host')}`;
+
+    // Define the pricing logic
+    let amount;
+    let description;
+    
+    switch (servicePlan) {
+      case 'monthly':
+        amount = 30 * 3; // $90 for 3 months
+        description = 'Monthly Service Plan (3-month minimum commitment)';
+        break;
+      case 'quarterly':
+        amount = 45;
+        description = 'Quarterly Service Plan';
+        break;
+      case 'oneTime':
+        amount = 60;
+        description = 'One Time Service';
+        break;
+      case 'buckeyeSummerPackage':
+        amount = 100;
+        description = 'Buckeye Summer Package';
+        break;
+      default:
+        throw new Error('Invalid service plan selected');
     }
 
-    // Create checkout session
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ['card'],
       line_items: [
         {
-          price: PRICE_IDS[servicePlan],
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Bin Cleaning Service',
+              description: description,
+            },
+            unit_amount: amount * 100,
+          },
           quantity: 1,
         },
       ],
-      mode: "payment",
-      success_url: `${process.env.DOMAIN_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.DOMAIN_URL}/cancel`,
-      customer_email: email,
       metadata: {
-        name,
-        phone,
-        address,
-        dayOfPickup,
-        timeOfPickup,
-        message: message || "No message provided",
+        ...data,
+        amount: amount,
+        description: description,
       },
+      mode: 'payment',
+      success_url: new URL('/success?session_id={CHECKOUT_SESSION_ID}', baseUrl).toString(),
+      cancel_url: new URL('/cancel', baseUrl).toString(),
     });
 
     return NextResponse.json({ success: true, url: session.url });
   } catch (error) {
-    console.error("Stripe checkout error: ", error);
+    console.error('Checkout error:', error);
     return NextResponse.json(
-      { success: false, message: "Error creating checkout session" },
-      { status: 500 },
+      { success: false, message: error.message },
+      { status: 500 }
     );
   }
 }

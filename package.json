@@ -17,6 +17,7 @@
     "cypress": "cypress run"
   },
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.1",
     "@sendgrid/mail": "^8.1.4",
     "axios": "^1.8.1",
     "class-variance-authority": "^0.7.1",

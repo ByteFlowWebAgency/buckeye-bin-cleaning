@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
+import * as admin from 'firebase-admin';
 
 // Create reusable transporter object using Gmail
 const transporter = nodemailer.createTransport({
@@ -22,19 +23,19 @@ const SERVICE_PLANS = {
 
 // Map price IDs to service plans
 const PRICE_ID_TO_PLAN = {
-  price_1QyejmQAAGErMriwUFBAzEE0: {
+  price_1R8ELrGMbVFwRLXqhUtIBohJ: {
     id: "monthly",
     display: "Monthly Service ($30)",
   },
-  price_1QyepkQAAGErMriwysZvBPkf: {
+  price_1R8ES4GMbVFwRLXq0Kwc7QZO: {
     id: "quarterly",
     display: "Quarterly Service ($45)",
   },
-  price_1QyeyIQAAGErMriw3nc43sbo: {
+  price_1R8EV4GMbVFwRLXqGIsSuhEB: {
     id: "oneTime",
     display: "One-Time Service ($60)",
   },
-  price_1Qyf73QAAGErMriwVB4LSNuG: {
+  price_1R8EZFGMbVFwRLXqAtRwjnuK: {
     id: "buckeyeSummerPackage",
     display: "Buckeye Summer Package ($100)",
   },
@@ -107,78 +108,27 @@ export async function POST(request) {
         const session = event.data.object;
         console.log('Processing checkout.session.completed for session:', session.id);
         
-        // Determine service plan using multiple methods in order of reliability
-        let servicePlan = "";
-        let servicePlanDisplay = "";
+        // Extract the service plan details
+        const servicePlan = session.metadata.servicePlan;
+        const description = session.metadata.description;
+        
+        // When saving to database, include the commitment information
+        if (servicePlan === 'monthly') {
+          const startDate = new Date();
+          const endDate = new Date(startDate);
+          endDate.setMonth(endDate.getMonth() + 3);
 
-        // Method 1: Check metadata first
-        if (
-          session.metadata?.servicePlan &&
-          SERVICE_PLANS[session.metadata.servicePlan]
-        ) {
-          servicePlan = session.metadata.servicePlan;
-          servicePlanDisplay = SERVICE_PLANS[servicePlan];
-          console.log("Service plan determined from metadata:", servicePlan);
-        }
-        // Method 2: Check line items if available
-        else if (
-          session.line_items &&
-          session.line_items.data &&
-          session.line_items.data.length > 0
-        ) {
-          const priceId = session.line_items.data[0].price.id;
-          if (PRICE_ID_TO_PLAN[priceId]) {
-            servicePlan = PRICE_ID_TO_PLAN[priceId].id;
-            servicePlanDisplay = PRICE_ID_TO_PLAN[priceId].display;
-            console.log("Service plan determined from line items:", servicePlan);
-          }
-        }
-        // Method 3: If line items aren't expanded, fetch them separately
-        else {
-          try {
-            console.log("Fetching line items for session:", session.id);
-            const lineItems = await stripe.checkout.sessions.listLineItems(
-              session.id,
-            );
-
-            if (lineItems.data && lineItems.data.length > 0) {
-              const priceId = lineItems.data[0].price.id;
-
-              if (PRICE_ID_TO_PLAN[priceId]) {
-                servicePlan = PRICE_ID_TO_PLAN[priceId].id;
-                servicePlanDisplay = PRICE_ID_TO_PLAN[priceId].display;
-                console.log(
-                  "Service plan determined from fetched line items:",
-                  servicePlan,
-                );
-              }
-            }
-          } catch (error) {
-            console.error("Error fetching line items:", error);
-          }
-        }
-
-        // Method 4: Finally, fallback to amount-based determination if still unknown
-        if (!servicePlan) {
-          const amount = session.amount_total / 100;
-
-          if (amount === 30) {
-            servicePlan = "monthly";
-            servicePlanDisplay = "Monthly Service ($30)";
-          } else if (amount === 45) {
-            servicePlan = "quarterly";
-            servicePlanDisplay = "Quarterly Service ($45)";
-          } else if (amount === 60) {
-            servicePlan = "oneTime";
-            servicePlanDisplay = "One-Time Service ($60)";
-          } else if (amount === 100) {
-            servicePlan = "buckeyeSummerPackage";
-            servicePlanDisplay = "Buckeye Summer Package ($100)";
-          } else {
-            servicePlan = "custom";
-            servicePlanDisplay = `Custom Service ($${amount.toFixed(2)})`;
-          }
-          console.log("Service plan determined from amount:", servicePlan);
+          await admin.firestore()
+            .collection('orders')
+            .doc(session.id)
+            .update({
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString(),
+              monthlyAmount: session.amount_total / 3 / 100,
+              totalAmount: session.amount_total / 100,
+              isMonthlyCommitment: true,
+              commitmentMonths: 3
+            });
         }
 
         // Format order details for emails and database with fallbacks for missing data
@@ -188,7 +138,7 @@ export async function POST(request) {
           email: session.customer_email || "No email provided",
           phone: session.metadata?.phone || "No phone provided",
           address: session.metadata?.address || "No address provided",
-          servicePlan: servicePlanDisplay,
+          servicePlan: SERVICE_PLANS[servicePlan],
           dayOfPickup: session.metadata?.dayOfPickup
             ? DAYS_OF_WEEK[session.metadata.dayOfPickup] ||
               session.metadata.dayOfPickup
@@ -213,7 +163,7 @@ export async function POST(request) {
 
             // Service plan information (now properly determined)
             servicePlan: servicePlan,
-            servicePlanDisplay: servicePlanDisplay,
+            servicePlanDisplay: SERVICE_PLANS[servicePlan],
 
             dayOfPickup: session.metadata?.dayOfPickup || "unknown",
             dayOfPickupDisplay: session.metadata?.dayOfPickup
@@ -267,8 +217,8 @@ export async function POST(request) {
                   <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
                 </div>
                 
-                <p>Our team will service your bins on your next trash pickup day.</p>
-                <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (440) 781-5527.</p>
+                <p>Thank you for choosing Buckeye Bin Cleaning! Our team will reach out within 1-3 business days to confirm your service details and schedule.</p>
+                <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (440) 230-6165.</p>
                 
                 <p>Thank you for choosing Buckeye Bin Cleaning!</p>
               </div>

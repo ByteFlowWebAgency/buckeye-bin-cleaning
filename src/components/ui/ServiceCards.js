@@ -62,6 +62,11 @@ const ServiceCard = ({
             <span>{ numberOfcans }</span>
           </li>
         </ul>
+        {serviceType === "Monthly" && (
+          <p className="text-xs text-red-800 mt-2">
+            3-month minimum commitment
+          </p>
+        )}
       </div>
       <Button
         onClick={ handlePlanSelection }
