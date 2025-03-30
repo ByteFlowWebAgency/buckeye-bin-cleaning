@@ -116,8 +116,8 @@ const Footer = () => {
                 <Image src={ Phone } alt="Phone icon" className="w-4 h-4 flex-shrink-0" />
                 <span>
                   Tel:{ " " }
-                  <a href="tel:440-781-5527" className="text-[#37B6FF] hover:underline">
-                    440-781-5527
+                  <a href="tel:440-230-6165" className="text-[#37B6FF] hover:underline">
+                    440-230-6165
                   </a>
                 </span>
               </li>

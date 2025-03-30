@@ -118,7 +118,7 @@ export async function POST(request) {
             
             <p>Your refund has been processed and should appear in your account within 5-10 business days, depending on your bank or card issuer.</p>
             
-            <p>If you have any questions about this refund, please contact us at ${process.env.EMAIL_USER} or call (440) 781-5527.</p>
+            <p>If you have any questions about this refund, please contact us at ${process.env.EMAIL_USER} or call (440) 230-6165.</p>
             
             <p>Thank you for considering Buckeye Bin Cleaning. We hope to serve you in the future!</p>
           </div>

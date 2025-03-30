@@ -285,6 +285,26 @@ export default function AdminDashboard() {
                   <p className="text-sm text-gray-900">Cancelled: { selectedOrder.cancelledAt && new Date(selectedOrder.cancelledAt.seconds * 1000).toLocaleString() }</p>
                 </div>
               ) }
+              { selectedOrder.servicePlan === 'monthly' && (
+                <div className="mt-2 space-y-1 text-sm">
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Commitment Period:</span>{' '}
+                    {new Date(selectedOrder.startDate).toLocaleDateString()} - {new Date(selectedOrder.endDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Monthly Amount:</span>{' '}
+                    ${selectedOrder.monthlyAmount?.toFixed(2)}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Total Paid:</span>{' '}
+                    ${selectedOrder.totalAmount?.toFixed(2)}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="font-semibold">Commitment:</span>{' '}
+                    {selectedOrder.commitmentMonths} months
+                  </p>
+                </div>
+              ) }
             </div>
             <div className="bg-gray-50 px-6 py-4 flex justify-between">
               { selectedOrder.status === "active" && (

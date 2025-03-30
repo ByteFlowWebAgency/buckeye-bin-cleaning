@@ -176,7 +176,7 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
                     <br />
                     Email: buckeyebincleaning@gmail.com
                     <br />
-                    Phone: 440-781-5527
+                    Phone: 440-230-6165
                   </p>
                 </div>
               ) : (
@@ -258,7 +258,7 @@ const PrivacyTermsModal = ({ isOpen, onClose, activeTab = "privacy" }) => {
                     <br />
                     Email: buckeyebincleaning@gmail.com
                     <br />
-                    Phone: 440-781-5527
+                    Phone: 440-230-6165
                   </p>
                 </div>
               ) }
