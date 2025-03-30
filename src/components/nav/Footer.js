@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 
@@ -64,7 +66,10 @@ const Footer = () => {
                   <a
                     href="#process"
                     aria-label="Process"
-                    onClick={ (e) => { e.preventDefault(); scrollToSection("process"); } }
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollToSection("process");
+                    }}
                     className="cursor-pointer hover:text-blue-500 transition-colors"
                   >
                     Process
