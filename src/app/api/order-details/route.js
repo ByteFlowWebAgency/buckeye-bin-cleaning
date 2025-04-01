@@ -10,10 +10,10 @@ const SERVICE_PLANS = {
 };
 
 const PRICE_ID_TO_PLAN = {
-  price_1QyejmQAAGErMriwUFBAzEE0: "Monthly Service ($30)",
-  price_1QyepkQAAGErMriwysZvBPkf: "Quarterly Service ($45)",
-  price_1QyeyIQAAGErMriw3nc43sbo: "One-Time Service ($60)",
-  price_1Qyf73QAAGErMriwVB4LSNuG: "Buckeye Summer Package ($100)",
+  price_1R8ELrGMbVFwRLXqhUtIBohJ: "Monthly Service ($30)",
+  price_1R8ES4GMbVFwRLXq0Kwc7QZO: "Quarterly Service ($45)",
+  price_1R8EV4GMbVFwRLXqGIsSuhEB: "One-Time Service ($60)",
+  price_1R8EZFGMbVFwRLXqAtRwjnuK: "Buckeye Summer Package ($100)",
 };
 
 const TIME_SLOTS = {
