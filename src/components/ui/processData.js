@@ -54,6 +54,6 @@ export const processSteps = [
     icon: billingIcon,
     title: "Billing",
     description:
-      "Billing will happen prior to service being done, please fill out your information on the website scheduling form, upon being filled out we will send an invoice to be paid via email.",
+      "Billing will occur before the service is performed. Please complete the sign up form on our website. Once the form is submitted, we will contact you with a service date within 1-3 days. An invoice will be emailed once payment is received.",
   },
 ];

@@ -192,7 +192,7 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
 
       if (!data.isWithinServiceArea) {
         setIsAddressValid(false);
-        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${ data.distance } miles from Parma). We currently only serve locations within 18 miles of Parma, Ohio.`);
+        setAddressValidationMessage(`We're sorry, but your location is outside our service area (${ data.distance } miles from Parma)`);
         return false;
       }
 
@@ -466,7 +466,7 @@ const SignUpForm = ({ preSelectedPlan = "" }) => {
             ) }
             { !isAddressValid && !errors.address && !addressValidationMessage && (
               <span className="text-gray-500 text-sm mt-1">
-                Type your address and select from suggestions. We serve areas within 18 miles of Parma, Ohio.
+                Type your address and select from suggestions.
               </span>
             ) }
           </motion.div>
