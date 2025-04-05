@@ -1,5 +1,90 @@
 # Buckeye Bin Cleaning
 
+A professional bin cleaning service application for the Greater Cleveland area.
+
+## Documentation
+
+Our documentation is organized into several sections for easy navigation:
+
+1. [Overview & Technology Stack](./docs/overview.md)
+   - Project architecture
+   - Technologies used
+   - Core features
+
+2. [Service Plans & Coverage](./docs/services.md)
+   - Available service plans
+   - Service area coverage
+   - Pricing structure
+
+3. [Technical Account Setup](./docs/account-setup.md)
+   - Firebase configuration
+   - Stripe integration
+   - Google Cloud Console setup
+   - Nodemailer email service
+
+4. [Environment Variables](./docs/environment.md)
+   - Required variables
+   - Configuration setup
+   - Deployment settings
+
+5. [Admin Dashboard](./docs/admin.md)
+   - Features overview
+   - Access management
+   - Order tracking
+
+6. [Order Processing](./docs/orders.md)
+   - Customer flow
+   - Payment processing
+   - Database structure
+   - Email notifications
+
+7. [Maintenance & Support](./docs/maintenance.md)
+   - Regular maintenance tasks
+   - Troubleshooting guide
+   - Support contacts
+
+## Quick Start
+
+### Prerequisites
+- Node.js 18.x or later
+- npm or yarn
+- Firebase account
+- Stripe account
+- Google Cloud Console account
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/buckeye-bin-cleaning.git
+cd buckeye-bin-cleaning
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Set up environment variables:
+   - Copy `.env.example` to `.env.local`
+   - Fill in the required values (see [Environment Variables](./docs/environment.md))
+
+4. Run the development server:
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Development
+
+For detailed development guidelines, please refer to our [documentation](./docs/).
+
+
 ## Prerequisites: Installing Docker
 
 ### Windows Installation
@@ -16,14 +101,181 @@
 3. Open Docker from your Applications folder
 4. Verify installation by running `docker --version` in Terminal
 
-## Getting Started
+## Flow
 
-### Cloning the Repository
-
-```bash
-git clone https://github.com/yourusername/roadtotheclassic.git
-cd roadtotheclassic
+### 1. Initial Setup (15 minutes)
+```mermaid
+graph TD
+    A[Clone Repository] -->|npm install| B[Install Dependencies]
+    B --> C[Copy .env.example]
+    C -->|Fill required values| D[Configure Environment]
+    D --> E[Run Development Server]
+    E -->|npm run dev| F[Verify Local Setup]
 ```
+
+### 2. Essential Configuration (30 minutes)
+1. **Firebase Setup**
+   - Create project
+   - Enable Authentication
+   - Set up Firestore
+   - [Details](./docs/account-setup.md#firebase-configuration)
+
+2. **Stripe Integration**
+   - Create account
+   - Get API keys
+   - Configure webhook
+   - [Details](./docs/account-setup.md#stripe-integration)
+
+3. **Google Maps Setup**
+   - Enable APIs
+   - Get API key
+   - Set restrictions
+   - [Details](./docs/account-setup.md#google-cloud-console-setup)
+
+### 3. Verify Setup (15 minutes)
+- [ ] Local development server running
+- [ ] Firebase authentication working
+- [ ] Stripe test payment successful
+- [ ] Google Maps address validation working
+- [ ] Email notifications sending
+
+## Comprehensive Documentation
+
+### Core Documentation
+1. [Overview & Technology Stack](./docs/overview.md)
+   - [Project Architecture](./docs/overview.md#project-architecture)
+   - [Core Technologies](./docs/overview.md#core-technologies)
+   - [Project Structure](./docs/overview.md#project-structure)
+   - [Core Features](./docs/overview.md#core-features)
+
+2. [Service Plans & Coverage](./docs/services.md)
+   - [Service Area](./docs/services.md#service-area)
+   - [Service Plans](./docs/services.md#service-plans)
+   - [Pricing Structure](./docs/services.md#pricing-structure)
+   - [Service Scheduling](./docs/services.md#service-scheduling)
+
+### Technical Documentation
+3. [Technical Account Setup](./docs/account-setup.md)
+   - [Firebase Configuration](./docs/account-setup.md#firebase-configuration)
+   - [Stripe Integration](./docs/account-setup.md#stripe-integration)
+   - [Google Cloud Setup](./docs/account-setup.md#google-cloud-console-setup)
+   - [Email Service](./docs/account-setup.md#nodemailer-email-service)
+
+4. [Environment Variables](./docs/environment.md)
+   - [Required Variables](./docs/environment.md#required-variables)
+   - [Environment Setup](./docs/environment.md#environment-setup)
+   - [Security Considerations](./docs/environment.md#security-considerations)
+   - [Troubleshooting](./docs/environment.md#troubleshooting)
+
+### Operational Documentation
+5. [Admin Dashboard](./docs/admin.md)
+   - [Access Control](./docs/admin.md#access-control)
+   - [Dashboard Features](./docs/admin.md#dashboard-features)
+   - [Admin API Endpoints](./docs/admin.md#admin-api-endpoints)
+   - [Best Practices](./docs/admin.md#best-practices)
+
+6. [Order Processing](./docs/orders.md)
+   - [Order Flow](./docs/orders.md#order-flow)
+   - [Database Structure](./docs/orders.md#database-structure)
+   - [API Endpoints](./docs/orders.md#api-endpoints)
+   - [Error Handling](./docs/orders.md#error-handling)
+
+7. [Maintenance & Support](./docs/maintenance.md)
+   - [Regular Maintenance](./docs/maintenance.md#regular-maintenance-tasks)
+   - [Troubleshooting Guide](./docs/maintenance.md#troubleshooting-guide)
+   - [Security Maintenance](./docs/maintenance.md#security-maintenance)
+   - [Performance Optimization](./docs/maintenance.md#performance-optimization)
+
+## Troubleshooting Flowchart
+
+```mermaid
+graph TD
+    A[Issue Detected] --> B{Type of Issue}
+    B -->|Authentication| C[Check Auth Flow]
+    B -->|Payment| D[Check Stripe]
+    B -->|Address| E[Check Google Maps]
+    B -->|Email| F[Check Nodemailer]
+    
+    C --> G{Admin Access?}
+    G -->|No| H[Verify Firebase Rules]
+    G -->|Yes| I[Check Admin Collection]
+    
+    D --> J{Payment Failed?}
+    J -->|Yes| K[Check Webhook Logs]
+    J -->|No| L[Verify Success Route]
+    
+    E --> M{Invalid Address?}
+    M -->|Yes| N[Check Service Area]
+    M -->|No| O[Verify API Key]
+    
+    F --> P{Emails Not Sending?}
+    P -->|Yes| Q[Check Email Credentials]
+    P -->|No| R[Check Email Templates]
+```
+
+## Common Issues and Solutions
+
+### Authentication Issues
+```javascript
+// Quick auth status check
+const checkAuthStatus = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  
+  if (!user) {
+    console.error('No user logged in');
+    return false;
+  }
+  
+  const token = await user.getIdToken();
+  return !!token;
+};
+```
+
+### Payment Processing
+```javascript
+// Verify Stripe webhook
+const verifyWebhook = async (signature, payload) => {
+  try {
+    const event = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+    return event;
+  } catch (err) {
+    console.error('Webhook verification failed:', err.message);
+    return null;
+  }
+};
+```
+
+### Address Validation
+```javascript
+// Quick address validation
+const validateAddress = async (address) => {
+  const response = await fetch(
+    `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+  );
+  const data = await response.json();
+  return data.status === 'OK';
+};
+```
+
+## Support Resources
+
+### Official Documentation
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Stripe Documentation](https://stripe.com/docs)
+- [Google Maps Documentation](https://developers.google.com/maps/documentation)
+
+### Community Support
+- [GitHub Issues](https://github.com/yourusername/buckeye-bin-cleaning/issues)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/nextjs)
+- [Firebase Support](https://firebase.google.com/support)
+- [Stripe Support](https://support.stripe.com)
+
 
 ### Docker Setup
 
