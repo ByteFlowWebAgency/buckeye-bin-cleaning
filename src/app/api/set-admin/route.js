@@ -11,15 +11,14 @@ export async function POST(request) {
   const { auth } = initFirebaseAdmin();
   
   if (!auth) {
-    console.log('Firebase Auth not available');
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: false, message: "Auth not available" },
+      { status: 500 }
+    );
   }
 
   try {
     const { email, secretKey } = await request.json();
-
-    console.log("Received secret key:", secretKey);
-    console.log("Expected secret key:", process.env.ADMIN_SECRET_KEY);
 
     // Verify secret key
     if (secretKey !== process.env.ADMIN_SECRET_KEY) {

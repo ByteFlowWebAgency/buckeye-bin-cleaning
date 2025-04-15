@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET_KEY;
-
 export async function POST(request) {
   // Skip during build phase
   if (process.env.NEXT_PHASE === 'phase-production-build') {
@@ -13,14 +11,16 @@ export async function POST(request) {
   const { auth } = initFirebaseAdmin();
   
   if (!auth) {
-    console.log('Firebase Auth not available');
-    return NextResponse.json({ success: true });
+    return NextResponse.json(
+      { success: false, message: "Auth not available" },
+      { status: 500 }
+    );
   }
 
   try {
     const { email, password, secretKey } = await request.json();
 
-    if (secretKey !== ADMIN_SECRET) {
+    if (secretKey !== process.env.ADMIN_SECRET_KEY) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
         { status: 401 },

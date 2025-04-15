@@ -5,8 +5,6 @@ import { SERVICE_PLANS, TIME_SLOTS, DAYS_OF_WEEK, RETRY_CONFIG } from '@/utils/c
 import { retry, maskString } from '@/utils/helpers';
 import { transporter } from '@/utils/email';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 // Helper function to find all orders for a session
 async function findOrdersForSession(db, sessionId) {
   const ordersRef = db.collection("orders");
@@ -27,6 +25,13 @@ function safeLog(message) {
 }
 
 export async function POST(request) {
+  // Skip during build phase
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    console.log('Skipping route execution during build phase');
+    return NextResponse.json({ success: true });
+  }
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const { db } = initFirebaseAdmin();
   
   if (!db) {
