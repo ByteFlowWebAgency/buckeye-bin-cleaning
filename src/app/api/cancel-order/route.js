@@ -68,48 +68,6 @@ async function checkExistingRefund(db, sessionId) {
   return !snapshot.empty;
 }
 
-// Retry configuration
-const RETRY_CONFIG = {
-  maxRetries: 3,
-  initialDelay: 1000,
-  maxDelay: 5000,
-};
-
-// Helper function to implement exponential backoff
-async function retry(operation, retryCount = 0) {
-  try {
-    return await operation();
-  } catch (error) {
-    if (retryCount >= RETRY_CONFIG.maxRetries) {
-      console.error(`Failed after ${retryCount} retries:`, error);
-      throw error;
-    }
-
-    const delay = Math.min(
-      RETRY_CONFIG.initialDelay * Math.pow(2, retryCount),
-      RETRY_CONFIG.maxDelay
-    );
-
-    console.log(`Retry attempt ${retryCount + 1}, waiting ${delay}ms`);
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return retry(operation, retryCount + 1);
-  }
-}
-
-// Helper function to find all orders for a session
-async function findOrdersForSession(db, sessionId) {
-  const ordersRef = db.collection("orders");
-  const snapshot = await ordersRef.where("stripeSessionId", "==", sessionId).get();
-  return snapshot.docs;
-}
-
-// Helper function to check if refund already exists
-async function checkExistingRefund(db, sessionId) {
-  const refundsRef = db.collection("refunds");
-  const snapshot = await refundsRef.where("sessionId", "==", sessionId).get();
-  return !snapshot.empty;
-}
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Create reusable transporter object using Gmail
@@ -129,7 +87,9 @@ function maskString(str, showLast = 4) {
 }
 
 // Helper function for safe logging
-function safe
+function safeLog(message) {
+  console.log(message);
+}
 
 export async function POST(request) {
   const { db } = initFirebaseAdmin();
