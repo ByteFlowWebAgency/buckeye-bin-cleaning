@@ -1,34 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
-
-const SERVICE_PLANS = {
-  monthly: "Monthly Service ($30)",
-  quarterly: "Quarterly Service ($45)",
-  oneTime: "One-Time Service ($60)",
-  buckeyeSummerPackage: "Buckeye Summer Package ($100)",
-};
-
-const PRICE_ID_TO_PLAN = {
-  price_1R8ELrGMbVFwRLXqhUtIBohJ: "Monthly Service ($30)",
-  price_1R8ES4GMbVFwRLXq0Kwc7QZO: "Quarterly Service ($45)",
-  price_1R8EV4GMbVFwRLXqGIsSuhEB: "One-Time Service ($60)",
-  price_1R8EZFGMbVFwRLXqAtRwjnuK: "Buckeye Summer Package ($100)",
-};
-
-const TIME_SLOTS = {
-  morning: "Morning (7am - 11am)",
-  afternoon: "Afternoon (11am - 2pm)",
-  evening: "Evening (2pm - 5pm)",
-};
-
-const DAYS_OF_WEEK = {
-  monday: "Monday",
-  tuesday: "Tuesday",
-  wednesday: "Wednesday",
-  thursday: "Thursday",
-  friday: "Friday",
-};
+import { SERVICE_PLANS, TIME_SLOTS, DAYS_OF_WEEK, PRICE_ID_TO_PLAN } from '@/utils/constants';
 
 export async function GET(request) {
   // Skip during build phase

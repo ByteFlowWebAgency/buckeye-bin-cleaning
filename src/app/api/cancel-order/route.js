@@ -1,58 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import nodemailer from "nodemailer";
 import { initFirebaseAdmin } from '@/lib/firebaseAdmin';
-import * as admin from 'firebase-admin';
+import { SERVICE_PLANS, TIME_SLOTS, DAYS_OF_WEEK, RETRY_CONFIG } from '@/utils/constants';
+import { retry, maskString } from '@/utils/helpers';
+import { transporter } from '@/utils/email';
 
-// Constants
-const SERVICE_PLANS = {
-  monthly: "Monthly Service ($30)",
-  quarterly: "Quarterly Service ($45)",
-  oneTime: "One-Time Service ($60)",
-  buckeyeSummerPackage: "Buckeye Summer Package ($100)",
-};
-
-const TIME_SLOTS = {
-  morning: "Morning (7am - 11am)",
-  afternoon: "Afternoon (11am - 2pm)",
-  evening: "Evening (2pm - 5pm)",
-};
-
-const DAYS_OF_WEEK = {
-  monday: "Monday",
-  tuesday: "Tuesday",
-  wednesday: "Wednesday",
-  thursday: "Thursday",
-  friday: "Friday",
-};
-
-// Retry configuration
-const RETRY_CONFIG = {
-  maxRetries: 3,
-  initialDelay: 1000,
-  maxDelay: 5000,
-};
-
-// Helper function to implement exponential backoff
-async function retry(operation, retryCount = 0) {
-  try {
-    return await operation();
-  } catch (error) {
-    if (retryCount >= RETRY_CONFIG.maxRetries) {
-      console.error(`Failed after ${retryCount} retries:`, error);
-      throw error;
-    }
-
-    const delay = Math.min(
-      RETRY_CONFIG.initialDelay * Math.pow(2, retryCount),
-      RETRY_CONFIG.maxDelay
-    );
-
-    console.log(`Retry attempt ${retryCount + 1}, waiting ${delay}ms`);
-    await new Promise(resolve => setTimeout(resolve, delay));
-    return retry(operation, retryCount + 1);
-  }
-}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Helper function to find all orders for a session
 async function findOrdersForSession(db, sessionId) {
@@ -66,24 +19,6 @@ async function checkExistingRefund(db, sessionId) {
   const refundsRef = db.collection("refunds");
   const snapshot = await refundsRef.where("sessionId", "==", sessionId).get();
   return !snapshot.empty;
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Create reusable transporter object using Gmail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
-});
-
-// Helper function to mask sensitive data
-function maskString(str, showLast = 4) {
-  if (!str) return '';
-  if (str.length <= showLast) return str;
-  return '*'.repeat(str.length - showLast) + str.slice(-showLast);
 }
 
 // Helper function for safe logging
