@@ -57,223 +57,296 @@ const DAYS_OF_WEEK = {
   friday: "Friday",
 };
 
+// Retry configuration
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  initialDelay: 1000,
+  maxDelay: 5000,
+};
+
+// Helper function to implement exponential backoff
+async function retry(operation, retryCount = 0) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (retryCount >= RETRY_CONFIG.maxRetries) {
+      console.error(`Failed after ${retryCount} retries:`, error);
+      throw error;
+    }
+
+    const delay = Math.min(
+      RETRY_CONFIG.initialDelay * Math.pow(2, retryCount),
+      RETRY_CONFIG.maxDelay
+    );
+
+    console.log(`Retry attempt ${retryCount + 1}, waiting ${delay}ms`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return retry(operation, retryCount + 1);
+  }
+}
+
+// Separate database operations for better error handling
+async function saveOrderToFirestore(db, orderData) {
+  return retry(async () => {
+    try {
+      const docRef = await db.collection("orders").add({
+        ...orderData,
+        retryCount: 0,
+        lastRetryAt: null,
+      });
+      console.log("✅ Order saved to Firestore:", docRef.id);
+      return docRef;
+    } catch (error) {
+      console.error("❌ Firestore save error:", error);
+      throw error;
+    }
+  });
+}
+
+// email sending with retry logic
+async function sendEmailWithRetry(transporter, mailOptions) {
+  return retry(async () => {
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log("✅ Email sent successfully:", info.messageId);
+      return info;
+    } catch (error) {
+      console.error("❌ Email send error:", error);
+      throw error;
+    }
+  });
+}
+
 export async function POST(request) {
-  // Skip during build phase
   if (process.env.NEXT_PHASE === 'phase-production-build') {
-    console.log('Skipping route execution during build phase');
     return NextResponse.json({ received: true });
   }
 
-  // Initialize services
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const { db } = initFirebaseAdmin();
   
   if (!db) {
-    console.log('Firebase DB not available');
-    return NextResponse.json({ received: true });
+    console.error('Firebase DB not initialized');
+    return NextResponse.json({ error: 'Database not available' }, { status: 500 });
   }
-
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  const payload = await request.text();
-  const sig = request.headers.get("stripe-signature");
 
   let event;
-
   try {
-    // Verify Stripe signature
-    if (!sig || !endpointSecret) {
-      console.error('Missing stripe signature or endpoint secret');
-      return NextResponse.json(
-        { error: 'Missing stripe signature or endpoint secret' },
-        { status: 400 }
-      );
-    }
+    event = await retry(async () => {
+      const payload = await request.text();
+      const sig = request.headers.get("stripe-signature");
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
-    console.log('Webhook event type:', event.type);
-    
+      if (!sig || !endpointSecret) {
+        throw new Error('Missing stripe signature or endpoint secret');
+      }
+
+      return stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+    });
   } catch (err) {
-    console.error(`⚠️ Webhook Error: ${err.message}`);
-    return NextResponse.json(
-      { error: `Webhook Error: ${err.message}` },
-      { status: 400 }
-    );
+    console.error(`Webhook Error:`, err);
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
-  // Handle specific event types
   try {
-    switch (event.type) {
-      case 'checkout.session.completed':
-        const session = event.data.object;
-        console.log('Processing checkout.session.completed for session:', session.id);
-        
-        // Extract the service plan details
-        const servicePlan = session.metadata.servicePlan;
-        const description = session.metadata.description;
-        
-        // When saving to database, include the commitment information
-        if (servicePlan === 'monthly') {
-          const startDate = new Date();
-          const endDate = new Date(startDate);
-          endDate.setMonth(endDate.getMonth() + 3);
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      
+      // Add idempotency check
+      const existingOrder = await db.collection('orders')
+        .where('stripeSessionId', '==', session.id)
+        .get();
 
-          await admin.firestore()
-            .collection('orders')
-            .doc(session.id)
-            .update({
-              startDate: startDate.toISOString(),
-              endDate: endDate.toISOString(),
-              monthlyAmount: session.amount_total / 3 / 100,
-              totalAmount: session.amount_total / 100,
-              isMonthlyCommitment: true,
-              commitmentMonths: 3
-            });
-        }
+      if (!existingOrder.empty) {
+        console.log(`Order for session ${session.id} already exists, skipping processing`);
+        return NextResponse.json({ received: true });
+      }
 
-        // Format order details for emails and database with fallbacks for missing data
-        const orderDetails = {
-          orderId: session.id.slice(-8),
-          name: session.metadata?.name || "Customer",
-          email: session.customer_email || "No email provided",
-          phone: session.metadata?.phone || "No phone provided",
-          address: session.metadata?.address || "No address provided",
-          servicePlan: SERVICE_PLANS[servicePlan],
-          dayOfPickup: session.metadata?.dayOfPickup
-            ? DAYS_OF_WEEK[session.metadata.dayOfPickup] ||
-              session.metadata.dayOfPickup
-            : "Not specified",
-          timeOfPickup: session.metadata?.timeOfPickup
-            ? TIME_SLOTS[session.metadata.timeOfPickup] ||
-              session.metadata.timeOfPickup
-            : "Not specified",
-          message: session.metadata?.message || "No special instructions",
-          amount: (session.amount_total / 100).toFixed(2),
-        };
+      console.log('Processing completed checkout session:', session.id);
 
-        // Store order in Firestore with null checks
+      // Add payment intent verification
+      if (session.payment_intent) {
         try {
-          const orderData = {
-            stripeSessionId: session.id,
-            paymentIntentId: session.payment_intent || null,
-            customerName: session.metadata?.name || "Customer",
-            customerEmail: session.customer_email || "No email provided",
-            customerPhone: session.metadata?.phone || "No phone provided",
-            address: session.metadata?.address || "No address provided",
+          const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+          if (paymentIntent.status !== 'succeeded') {
+            console.error(`Payment intent ${session.payment_intent} status is ${paymentIntent.status}`);
+            throw new Error('Payment intent not succeeded');
+          }
+          console.log(`✅ Verified payment intent ${session.payment_intent} status: succeeded`);
+        } catch (error) {
+          console.error('Failed to verify payment intent:', error);
+          throw error;
+        }
+      }
 
-            // Service plan information (now properly determined)
-            servicePlan: servicePlan,
-            servicePlanDisplay: SERVICE_PLANS[servicePlan],
+      // Prepare order data
+      const orderData = {
+        stripeSessionId: session.id,
+        paymentIntentId: session.payment_intent || null,
+        customerName: session.metadata?.name || "Customer",
+        customerEmail: session.customer_email || "No email provided",
+        customerPhone: session.metadata?.phone || "No phone provided",
+        address: session.metadata?.address || "No address provided",
+        servicePlan: session.metadata.servicePlan,
+        servicePlanDisplay: SERVICE_PLANS[session.metadata.servicePlan],
+        dayOfPickup: session.metadata?.dayOfPickup || "unknown",
+        dayOfPickupDisplay: DAYS_OF_WEEK[session.metadata?.dayOfPickup] || "Not specified",
+        timeOfPickup: session.metadata?.timeOfPickup || "unknown",
+        timeOfPickupDisplay: TIME_SLOTS[session.metadata?.timeOfPickup] || "Not specified",
+        message: session.metadata?.message || "No special instructions",
+        amount: session.amount_total / 100,
+        status: "active",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        processedAt: new Date().toISOString(),
+      };
 
-            dayOfPickup: session.metadata?.dayOfPickup || "unknown",
-            dayOfPickupDisplay: session.metadata?.dayOfPickup
-              ? DAYS_OF_WEEK[session.metadata.dayOfPickup] ||
-                session.metadata.dayOfPickup
-              : "Not specified",
+      // Add monthly commitment details if applicable
+      if (session.metadata.servicePlan === 'monthly') {
+        const startDate = new Date();
+        const endDate = new Date(startDate);
+        endDate.setMonth(endDate.getMonth() + 3);
 
-            timeOfPickup: session.metadata?.timeOfPickup || "unknown",
-            timeOfPickupDisplay: session.metadata?.timeOfPickup
-              ? TIME_SLOTS[session.metadata.timeOfPickup] ||
-                session.metadata.timeOfPickup
-              : "Not specified",
+        orderData.startDate = startDate.toISOString();
+        orderData.endDate = endDate.toISOString();
+        orderData.monthlyAmount = session.amount_total / 3 / 100;
+        orderData.totalAmount = session.amount_total / 100;
+        orderData.isMonthlyCommitment = true;
+        orderData.commitmentMonths = 3;
+      }
 
-            message: session.metadata?.message || "No special instructions",
-            amount: session.amount_total / 100,
-            status: "active",
-            createdAt: new Date(),
+      // Save to Firestore with retry logic
+      let docRef;
+      try {
+        docRef = await saveOrderToFirestore(db, orderData);
+      } catch (dbError) {
+        // Log failed webhook for manual review
+        await retry(async () => {
+          await db.collection("failed_webhooks").add({
+            eventId: event.id,
+            type: event.type,
+            error: dbError.message,
+            orderData: orderData,
+            failedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        throw dbError;
+      }
+
+      // Send emails with retry logic
+      if (docRef) {
+        try {
+          const customerEmailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #ed1c24;">Thank You for Your Order!</h2>
+              <p>Hello ${orderData.customerName},</p>
+              <p>Your bin cleaning service has been scheduled successfully. Here are your order details:</p>
+
+              <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p><strong>Order ID:</strong> ${docRef.id}</p>
+                <p><strong>Service Plan:</strong> ${orderData.servicePlanDisplay}</p>
+                <p><strong>Service Address:</strong> ${orderData.address}</p>
+                <p><strong>Pickup Schedule:</strong> ${orderData.dayOfPickupDisplay}, ${orderData.timeOfPickupDisplay}</p>
+                <p><strong>Total Paid:</strong> $${orderData.amount}</p>
+              </div>
+
+              <p>Thank you for choosing Buckeye Bin Cleaning! Our team will reach out within 1-3 business days to confirm your service details and schedule.</p>
+              <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (440) 230-6165.</p>
+
+              <p>Thank you for choosing Buckeye Bin Cleaning!</p>
+            </div>
+          `;
+
+          const businessEmailHtml = `
+            <div style="font-family: Arial, sans-serif;">
+              <h2 style="color: #ed1c24;">New Order Received!</h2>
+              <p>A new bin cleaning order has been placed:</p>
+
+              <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p><strong>Order ID:</strong> ${docRef.id}</p>
+                <p><strong>Customer:</strong> ${orderData.customerName}</p>
+                <p><strong>Email:</strong> ${orderData.customerEmail}</p>
+                <p><strong>Phone:</strong> ${orderData.customerPhone}</p>
+                <p><strong>Service Plan:</strong> ${orderData.servicePlanDisplay}</p>
+                <p><strong>Service Address:</strong> ${orderData.address}</p>
+                <p><strong>Pickup Schedule:</strong> ${orderData.dayOfPickupDisplay}, ${orderData.timeOfPickupDisplay}</p>
+                <p><strong>Special Instructions:</strong> ${orderData.message}</p>
+                <p><strong>Total Paid:</strong> $${orderData.amount}</p>
+                ${orderData.isMonthlyCommitment ? `
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                  <p><strong>Monthly Commitment Details:</strong></p>
+                  <p>Start Date: ${new Date(orderData.startDate).toLocaleDateString()}</p>
+                  <p>End Date: ${new Date(orderData.endDate).toLocaleDateString()}</p>
+                  <p>Monthly Amount: $${orderData.monthlyAmount}</p>
+                  <p>Total Commitment: $${orderData.totalAmount}</p>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+
+          const customerMailOptions = {
+            from: `"Buckeye Bin Cleaning" <${process.env.EMAIL_USER}>`,
+            to: orderData.customerEmail,
+            subject: "Your Buckeye Bin Cleaning Order Confirmation",
+            html: customerEmailHtml
           };
 
-          console.log('Attempting to save order to Firestore:', orderData);
-          const docRef = await db.collection("orders").add(orderData);
-          console.log("✅ Order saved to Firestore with ID:", docRef.id);
-        } catch (dbError) {
-          console.error("❌ Firestore Error:", dbError);
-          console.error("Error details:", {
-            code: dbError.code,
-            message: dbError.message,
-            stack: dbError.stack
-          });
-          // Continue with emails even if DB fails
-        }
-
-        // Send emails
-        try {
-          // Send confirmation to customer
-          await transporter.sendMail({
-            from: `"Buckeye Bin Cleaning" <${process.env.EMAIL_USER}>`,
-            to: session.customer_email,
-            subject: "Your Buckeye Bin Cleaning Order Confirmation",
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #ed1c24;">Thank You for Your Order!</h2>
-                <p>Hello ${orderDetails.name},</p>
-                <p>Your bin cleaning service has been scheduled successfully. Here are your order details:</p>
-                
-                <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
-                  <p><strong>Service Plan:</strong> ${orderDetails.servicePlan}</p>
-                  <p><strong>Service Address:</strong> ${orderDetails.address}</p>
-                  <p><strong>Pickup Schedule:</strong> ${orderDetails.dayOfPickup}, ${orderDetails.timeOfPickup}</p>
-                  <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
-                </div>
-                
-                <p>Thank you for choosing Buckeye Bin Cleaning! Our team will reach out within 1-3 business days to confirm your service details and schedule.</p>
-                <p>If you need to make any changes or have questions, please contact us at ${process.env.EMAIL_USER} or call (440) 230-6165.</p>
-                
-                <p>Thank you for choosing Buckeye Bin Cleaning!</p>
-              </div>
-            `,
-          });
-
-          // Send notification to business owner
-          await transporter.sendMail({
+          const businessMailOptions = {
             from: `"Buckeye Bin Cleaning System" <${process.env.EMAIL_USER}>`,
             to: process.env.OWNER_EMAIL,
             subject: "New Bin Cleaning Order",
-            html: `
-              <div style="font-family: Arial, sans-serif;">
-                <h2 style="color: #ed1c24;">New Order Received!</h2>
-                <p>A new bin cleaning order has been placed:</p>
-                
-                <div style="background-color: #f7f7f7; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <p><strong>Order ID:</strong> ${orderDetails.orderId}</p>
-                  <p><strong>Customer:</strong> ${orderDetails.name}</p>
-                  <p><strong>Email:</strong> ${orderDetails.email}</p>
-                  <p><strong>Phone:</strong> ${orderDetails.phone}</p>
-                  <p><strong>Service Plan:</strong> ${orderDetails.servicePlan}</p>
-                  <p><strong>Service Address:</strong> ${orderDetails.address}</p>
-                  <p><strong>Pickup Schedule:</strong> ${orderDetails.dayOfPickup}, ${orderDetails.timeOfPickup}</p>
-                  <p><strong>Special Instructions:</strong> ${orderDetails.message}</p>
-                  <p><strong>Total Paid:</strong> $${orderDetails.amount}</p>
-                </div>
-                
-                <p>This order has been added to the schedule.</p>
-              </div>
-            `,
+            html: businessEmailHtml
+          };
+
+          // Send both emails with retry logic
+          await Promise.all([
+            sendEmailWithRetry(transporter, customerMailOptions),
+            sendEmailWithRetry(transporter, businessMailOptions)
+          ]);
+
+          // Log successful email sending
+          await db.collection("email_logs").add({
+            orderId: docRef.id,
+            customerEmail: orderData.customerEmail,
+            businessEmail: process.env.OWNER_EMAIL,
+            sentAt: admin.firestore.FieldValue.serverTimestamp(),
+            success: true
           });
 
-          console.log("📧 Emails sent successfully");
         } catch (emailError) {
-          console.error("❌ Email Error:", emailError);
+          console.error("Failed to send emails:", emailError);
+          
+          // Log email failure but don't throw error to prevent webhook retry
+          await db.collection("failed_emails").add({
+            orderId: docRef.id,
+            error: emailError.message,
+            customerEmail: orderData.customerEmail,
+            businessEmail: process.env.OWNER_EMAIL,
+            failedAt: admin.firestore.FieldValue.serverTimestamp(),
+            orderData: orderData // Store order data for manual resend if needed
+          });
+
+          // Attempt to notify admin of email failure through alternative means
+          try {
+            await db.collection("notifications").add({
+              type: "email_failure",
+              orderId: docRef.id,
+              message: "Failed to send order confirmation emails",
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              requiresAction: true
+            });
+          } catch (notificationError) {
+            console.error("Failed to create email failure notification:", notificationError);
+          }
         }
-        break;
-
-      // Handle other event types if needed
-      case 'payment_intent.succeeded':
-        console.log('PaymentIntent succeeded:', event.data.object.id);
-        break;
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+      }
     }
 
-    return NextResponse.json({ received: true, type: event.type });
-    
-  } catch (error) {
-    console.error(`❌ Error processing webhook:`, error);
-    console.error('Error stack:', error.stack);
+    return NextResponse.json({ received: true });
+  } catch (err) {
+    console.error(`Error processing webhook:`, err);
     return NextResponse.json(
-      { error: 'Webhook processing failed', details: error.message },
+      { error: 'Webhook processing failed' },
       { status: 500 }
     );
   }
