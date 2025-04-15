@@ -20,9 +20,27 @@ export default function AdminDashboard() {
         const q = query(ordersRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
         
-        const ordersData = [];
+        // Create a Map to store unique orders by stripeSessionId
+        const uniqueOrders = new Map();
+        
         querySnapshot.forEach((doc) => {
-          ordersData.push({ id: doc.id, ...doc.data() });
+          const orderData = { id: doc.id, ...doc.data() };
+          const sessionId = orderData.stripeSessionId;
+          
+          // Only add the order if we haven't seen this sessionId before
+          if (!uniqueOrders.has(sessionId)) {
+            uniqueOrders.set(sessionId, orderData);
+          }
+        });
+        
+        // Convert Map values back to array
+        const ordersData = Array.from(uniqueOrders.values());
+        
+        // Sort by createdAt date (newest first)
+        ordersData.sort((a, b) => {
+          const dateA = a.createdAt?.seconds || 0;
+          const dateB = b.createdAt?.seconds || 0;
+          return dateB - dateA;
         });
         
         setOrders(ordersData);

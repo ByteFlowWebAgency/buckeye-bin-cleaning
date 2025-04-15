@@ -27,7 +27,7 @@ export async function POST(req) {
 
   try {
     const data = await req.json();
-    const { servicePlan } = data;
+    const { servicePlan, email } = data;
 
     // Get the base URL from environment or construct it from the request
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
@@ -60,6 +60,7 @@ export async function POST(req) {
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      customer_email: email,
       line_items: [
         {
           price_data: {
@@ -75,12 +76,20 @@ export async function POST(req) {
       ],
       metadata: {
         ...data,
+        email: email,
         amount: amount,
         description: description,
       },
       mode: 'payment',
       success_url: new URL('/success?session_id={CHECKOUT_SESSION_ID}', baseUrl).toString(),
       cancel_url: new URL('/cancel', baseUrl).toString(),
+    });
+
+    // Log session creation for debugging
+    console.log('Created checkout session:', {
+      sessionId: session.id,
+      customerEmail: email,
+      metadata: session.metadata,
     });
 
     return NextResponse.json({ success: true, url: session.url });
