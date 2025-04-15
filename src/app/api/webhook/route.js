@@ -132,35 +132,42 @@ export async function POST(request) {
 
   let event;
   try {
-    const payload = await request.text();
-    const sig = request.headers.get("stripe-signature");
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    event = await retry(async () => {
+      const payload = await request.text();
+      const sig = request.headers.get("stripe-signature");
+      const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    if (!sig || !endpointSecret) {
-      console.error('Missing signature or endpoint secret');
-      console.log('Headers:', Object.fromEntries(request.headers.entries()));
-      return NextResponse.json(
-        { error: 'Missing signature or endpoint secret' },
-        { status: 400 }
-      );
-    }
+      if (!sig || !endpointSecret) {
+        console.error('Missing webhook signature or endpoint secret');
+        return NextResponse.json(
+          { error: 'Missing webhook signature or endpoint secret' },
+          { status: 400 }
+        );
+      }
 
-    try {
-      event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
-      console.log('Signature:', sig);
-      console.log('Endpoint Secret:', endpointSecret.substring(0, 4) + '...');
-      return NextResponse.json(
-        { error: `Webhook Error: ${err.message}` },
-        { status: 400 }
-      );
-    }
+      try {
+        return stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+      } catch (err) {
+        // Mask sensitive data in logs
+        console.error('Webhook signature verification failed:', {
+          error: err.message,
+          signaturePresent: !!sig,
+          endpointSecretPresent: !!endpointSecret
+        });
+        return NextResponse.json(
+          { error: `Webhook Error: Signature verification failed` },
+          { status: 400 }
+        );
+      }
+    });
   } catch (err) {
-    console.error('Error parsing webhook payload:', err);
+    console.error('Error processing webhook:', {
+      error: err.message,
+      eventType: event?.type || 'unknown'
+    });
     return NextResponse.json(
-      { error: 'Webhook error' },
-      { status: 400 }
+      { error: 'Webhook processing failed' },
+      { status: 500 }
     );
   }
 

@@ -79,6 +79,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Helper function to mask sensitive data
+function maskString(str, showLast = 4) {
+  if (!str) return '';
+  if (str.length <= showLast) return str;
+  return '*'.repeat(str.length - showLast) + str.slice(-showLast);
+}
+
+// Helper function for safe logging
+function safe
+
 export async function POST(request) {
   const { db } = initFirebaseAdmin();
   
