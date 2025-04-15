@@ -56,18 +56,34 @@ function SuccessContent() {
     if (result.isConfirmed) {
       setCancelling(true);
       try {
+        // Add error handling for fetch
         const response = await fetch("/api/cancel-order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ sessionId }),
+          body: JSON.stringify({ 
+            sessionId: sessionId 
+          }),
         });
+
+        if (!response.ok) {
+          // Handle non-200 responses
+          const errorText = await response.text();
+          let errorMessage;
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.message || 'Failed to cancel order';
+          } catch {
+            errorMessage = errorText || 'Failed to cancel order';
+          }
+          throw new Error(errorMessage);
+        }
 
         const data = await response.json();
         
         if (data.success) {
-          Swal.fire(
+          await Swal.fire(
             "Order Cancelled",
             "Your order has been cancelled and your payment will be refunded within 5-10 business days.",
             "success"
@@ -79,9 +95,9 @@ function SuccessContent() {
         }
       } catch (error) {
         console.error("Error cancelling order:", error);
-        Swal.fire(
+        await Swal.fire(
           "Error",
-          "There was a problem cancelling your order. Please contact customer support.",
+          `There was a problem cancelling your order: ${error.message}. Please contact customer support.`,
           "error"
         );
       } finally {
