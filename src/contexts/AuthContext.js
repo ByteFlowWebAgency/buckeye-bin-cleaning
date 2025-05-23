@@ -58,7 +58,6 @@ export function AuthProvider({ children }) {
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         
-        // Check admin status in Firestore
         const adminDoc = await getDoc(doc(db, 'admins', email));
         
         if (!adminDoc.exists() || !adminDoc.data().isAdmin) {
