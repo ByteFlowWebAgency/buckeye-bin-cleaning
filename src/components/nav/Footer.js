@@ -147,7 +147,7 @@ const Footer = () => {
             </p>
           </div>
           <p className="text-center sm:text-right">
-            © 2025 | Buckeye Bin Cleaning | All Rights Reserved
+            © {new Date().getFullYear()} | Buckeye Bin Cleaning | All Rights Reserved
           </p>
         </div>
       </div>
